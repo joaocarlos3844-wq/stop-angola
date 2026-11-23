@@ -1,7 +1,7 @@
 """Joga uma ronda completa contra o servidor real (server.js), com 3 browsers separados.
 
     npm install
-    python tests/test_servidor.py      # resultado esperado: Carla 30, Ana 25, João 5
+    python tests/test_servidor.py      # esperado: Carla 30, Ana 25, João 5 (sem juiz: João 15)
 
 Arranca o servidor com STOP_FAKE_JUDGE=1 (o juiz não chama a API: palavras com "zz" são inválidas).
 Para testar contra um servidor já a correr: STOP_URL=https://... python tests/test_servidor.py
@@ -51,8 +51,9 @@ try:
         for pg, vals in ((A, ['Ana', 'Angola', 'Ananás']), (B, ['Abel', 'Angola', 'Azzzz']), (C, ['Amélia', 'Argélia', 'Abacate'])):
             for i, v in enumerate(vals): pg.fill(f'[data-ans="{i}"]', v)
         C.wait_for_timeout(700); C.click('#stopbtn')
-        for pg in pages: pg.wait_for_selector('.judge.ok', timeout=15000)
+        for pg in pages: pg.wait_for_selector('.judge.ok, .judge.off', timeout=15000)
         B.screenshot(path=os.path.join(shots, 'revisao.png'), full_page=True)
+        judge_on = A.locator('.judge.ok').count() > 0  # sem juiz, o "Azzzz" do João conta: 15 em vez de 5
         # Ana e Carla contestam o "Abel" do João (p=1, c=0)
         A.click('[data-a=vote][data-p="1"][data-c="0"]'); C.click('[data-a=vote][data-p="1"][data-c="0"]')
         A.wait_for_function("document.body.innerText.includes('Anulada pelos jogadores')", timeout=5000)
@@ -61,8 +62,8 @@ try:
         res = C.inner_text('.lb').replace('\n', ' ')
         print('Pontuação vista pela Carla:', res)
         print('Erros nas páginas:', errs)
-        ok = 'Carla' in res and '30' in res and '25' in res and not errs
-        order = [l for l in C.inner_text('.lb').split('\n') if l.strip()]
+        print('Juiz:', 'ligado' if judge_on else 'desligado (só votos)')
+        ok = 'Carla' in res and '30' in res and '25' in res and (('+5' in res) if judge_on else ('+15' in res)) and not errs
         print('Capturas em', shots)
         b.close()
 finally:
