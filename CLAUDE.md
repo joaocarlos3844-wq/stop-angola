@@ -19,20 +19,25 @@ Jogo multijogador de "Stop" (Adedonha) para telemóvel. Cada jogador joga no seu
 - **Juiz** (`runJudge()`): corre só no dispositivo do anfitrião. Deduplica (categoria + resposta) e envia uma única prompt JSON. O pedido de "aquecimento" em `hostStart()` faz a Claude pedir o consentimento no clique.
 - O render usa uma `key` por ecrã para não redesenhar (nem perder o foco) enquanto se escreve.
 
-## Próximo passo pedido pelo utilizador: correr fora da Claude
+## Versão pública (fora da Claude): feita
 
-Objectivo: qualquer pessoa joga por um link, sem conta Claude.
+- `server.js` (Express + Socket.IO): serve `index.html` e `public/` e implementa as salas com o mesmo modelo de `room`. Cada separador guarda um `sid` secreto em `sessionStorage`, e o servidor deriva dele o `peer`, por isso o id mantém-se ao religar. No `lobby` o servidor só envia os peers com `hosting` (no máximo 40). Presence até 4 KiB, salas até 16 peers, limites de ritmo por socket.
+- `public/claude-shim.js`: define `window.claude.use('room'|'sample')` só se ainda não existir (dentro da Claude e nos testes com mock não faz nada). O `sample.json()` extrai a letra e os itens da prompt do jogo e envia-os pelo evento de socket `judge`. Não há `POST /api/judge`, porque o socket já identifica a sala e o anfitrião.
+- Juiz: o servidor volta a montar a prompt (o cliente não pode enviar uma prompt qualquer) e só aceita pedidos do anfitrião (o peer que publica `game`), com pelo menos 5 s entre pedidos, 40 por hora por sala e `MAX_JUDGE_PER_DAY` no total. Modelo `claude-opus-5-5` (ou `ANTHROPIC_MODEL`), effort `low`, com `fallbacks: "default"` em caso de recusa. Sem `ANTHROPIC_API_KEY` o juiz fica desligado e decide-se por votos.
+- PWA: `public/manifest.webmanifest`, ícones e `sw.js` (rede primeiro; só é registado em https).
+- Alojamento: `render.yaml` (Render, plano free). Variáveis: `ANTHROPIC_API_KEY` (secreta) e `MAX_JUDGE_PER_DAY`.
 
-1. `server.js` (Node + Express + Socket.IO): serve `index.html` e implementa salas com o **mesmo modelo** de `room` (join por nome, presence por socket, lista de peers com `peer`, `isMe`, `sameTab`, `presence`; remover o peer ao desligar).
-2. `public/claude-shim.js`: define `window.claude.use('room')` e `use('sample')` por cima do Socket.IO e de um endpoint `POST /api/judge`, para o código do jogo ficar praticamente igual. Carregá-lo antes do script principal.
-3. `/api/judge` chama a API da Anthropic no servidor, com a chave em `ANTHROPIC_API_KEY` (nunca na página). Deve validar e limitar o tamanho da prompt e o ritmo de pedidos por sala.
-4. Alojar num serviço Node (Render, Railway ou Fly.io) e, opcionalmente, transformar em PWA (manifest + ícone) para "instalar" no telemóvel.
-5. Manter os testes: adaptar `tests/test_ronda.py` para correr contra o servidor real com 3 browsers.
-
-## Testar agora (versão com mock)
+## Testes
 
 ```bash
-python3 -m http.server 8765        # na pasta do projecto
-pip install playwright && playwright install chromium
-python3 tests/test_ronda.py        # resultado esperado: Carla 30, Ana 25, João 5
+npm install
+pip install playwright && python -m playwright install chromium
+python tests/test_servidor.py      # servidor real + 3 browsers, juiz falso (STOP_FAKE_JUDGE=1)
+python -m http.server 8765         # noutro terminal, para o teste com mock:
+python tests/test_ronda.py
+# resultado esperado nos dois: Carla 30, Ana 25, João 5
 ```
+
+`STOP_URL=https://<app>.onrender.com python tests/test_servidor.py` joga contra o servidor publicado (com o juiz verdadeiro, os pontos podem variar).
+
+Nota: ao escrever ficheiros com ferramentas, os escapes unicode nas regex (barra + u + 4 dígitos) podem ficar como caracteres literais, e o U+2028 parte a linha. Confirmar sempre com `node --check`.
