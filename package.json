@@ -5,13 +5,15 @@
   "description": "Stop! — o jogo das letras (multijogador, Angola)",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node tests/test_dicionario.js"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^1.12.0",
+    "@cspell/dict-pt-pt": "^3.0.8",
+    "cspell-trie-lib": "^10.5.2",
     "express": "^4.21.2",
     "socket.io": "^4.8.1"
   }

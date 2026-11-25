@@ -1,0 +1,231 @@
+# Cidades (Angola, países lusófonos e grandes cidades do mundo).
+# Também são aceites as cidades que já estão no dicionário como nome próprio.
+Luanda
+Benguela
+Lobito
+Huambo
+Lubango
+Malanje
+Namibe
+Moçâmedes
+Cabinda
+Uíge
+Soyo
+Saurimo
+Luena
+Menongue
+Ondjiva
+Kuito
+Cuíto
+Caxito
+Sumbe
+Ndalatando
+Dundo
+Mbanza Kongo
+Mbanza Congo
+Catumbela
+Viana
+Cacuaco
+Cazenga
+Belas
+Talatona
+Kilamba
+Porto Amboim
+Gabela
+Caála
+Ganda
+Cubal
+Matala
+Chibia
+Tômbwa
+Tombua
+Lucapa
+Negage
+Camabatela
+Cuito Cuanavale
+Lumeje
+Andulo
+Bailundo
+Longonjo
+Catete
+Dondo
+Calulo
+Quibala
+Waku Kungo
+Cela
+Xangongo
+Calai
+Cuangar
+Muxima
+Damba
+Maquela do Zombo
+Nzeto
+Ambriz
+Lisboa
+Porto
+Coimbra
+Braga
+Faro
+Aveiro
+Évora
+Funchal
+Setúbal
+Maputo
+Beira
+Nampula
+Quelimane
+Praia
+Mindelo
+Bissau
+São Tomé
+Díli
+Brasília
+Rio de Janeiro
+São Paulo
+Salvador
+Recife
+Fortaleza
+Manaus
+Belém
+Curitiba
+Porto Alegre
+Belo Horizonte
+Abuja
+Lagos
+Acra
+Adis Abeba
+Argel
+Cairo
+Alexandria
+Casablanca
+Rabat
+Tunes
+Trípoli
+Dacar
+Bamaco
+Kinshasa
+Brazzaville
+Lubumbashi
+Libreville
+Iaundé
+Duala
+Nairobi
+Mombaça
+Kampala
+Kigali
+Bujumbura
+Dar es Salaam
+Dodoma
+Lusaca
+Harare
+Bulawayo
+Gaborone
+Windhoek
+Joanesburgo
+Pretória
+Cidade do Cabo
+Durban
+Antananarivo
+Cartum
+Mogadíscio
+Amesterdão
+Amsterdã
+Atenas
+Barcelona
+Berlim
+Berna
+Bruxelas
+Budapeste
+Bucareste
+Copenhaga
+Dublin
+Edimburgo
+Estocolmo
+Genebra
+Hamburgo
+Helsínquia
+Istambul
+Kiev
+Liverpool
+Londres
+Lyon
+Madrid
+Manchester
+Marselha
+Milão
+Moscovo
+Moscou
+Munique
+Nápoles
+Nice
+Oslo
+Paris
+Praga
+Roma
+Sevilha
+Turim
+Valência
+Varsóvia
+Veneza
+Viena
+Zurique
+Bagdade
+Banguecoque
+Bangkok
+Pequim
+Xangai
+Hong Kong
+Tóquio
+Osaca
+Seul
+Singapura
+Jacarta
+Manila
+Mumbai
+Bombaim
+Nova Deli
+Deli
+Calcutá
+Carachi
+Teerão
+Riade
+Meca
+Dubai
+Doha
+Jerusalém
+Telavive
+Beirute
+Damasco
+Amã
+Hanói
+Taipé
+Sydney
+Melbourne
+Auckland
+Nova Iorque
+Nova York
+Los Angeles
+Chicago
+Miami
+Washington
+Boston
+São Francisco
+Las Vegas
+Houston
+Toronto
+Montreal
+Vancouver
+Otava
+Cidade do México
+Havana
+Bogotá
+Lima
+Santiago
+Buenos Aires
+Montevidéu
+Montevideu
+Caracas
+Quito
+La Paz
+Assunção
+Panamá

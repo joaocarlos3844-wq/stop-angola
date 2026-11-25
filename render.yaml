@@ -7,8 +7,3 @@ services:
     buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /healthz
-    envVars:
-      - key: ANTHROPIC_API_KEY
-        sync: false        # o Render pede o valor ao criar (nunca vai para o repositório)
-      - key: MAX_JUDGE_PER_DAY
-        value: "2000"

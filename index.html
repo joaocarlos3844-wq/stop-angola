@@ -170,6 +170,8 @@ const SUGGEST=['Cidade','Profissão','Comida','Marca','Filme / Novela','Cantor',
 const LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const HARD=['K','W','Y','X'];
 const MAXP=10, MAXC=10, ANSLEN=22;
+const LEVELS=[['facil','Fácil','Ignora acentos e aceita 1 ou 2 letras erradas.'],['medio','Médio','Ignora acentos, mas a palavra tem de estar bem escrita.'],['dificil','Difícil','Ortografia exacta, acentos incluídos.']];
+const lvName=v=>(LEVELS.find(l=>l[0]===v)||LEVELS[1])[1];
 const app=document.getElementById('app'), ov=document.getElementById('overlay');
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
@@ -244,7 +246,7 @@ function sanitizeGame(g){
   const cats=g.cats.slice(0,MAXC).map(c=>clean(c,20)).filter(Boolean);
   const L=LETTERS.includes(g.L)?g.L:null;
   const jr={};if(g.jr&&typeof g.jr==='object')Object.keys(g.jr).slice(0,120).forEach(k=>{if(/^\d+\.\d+$/.test(k))jr[k]=clean(g.jr[k],40)});
-  return {code:clean(g.code,8),ph,n:+g.n||0,pk:+g.pk||0,L,cats,t:+g.t||0,mr:+g.mr||0,hard:!!g.hard,judge:!!g.judge,
+  return {code:clean(g.code,8),ph,n:+g.n||0,pk:+g.pk||0,L,cats,t:+g.t||0,mr:+g.mr||0,hard:!!g.hard,judge:!!g.judge,lv:LEVELS.some(l=>l[0]===g.lv)?g.lv:'medio',
     used:String(g.used||'').replace(/[^A-Z]/g,''),ro,
     hist:(Array.isArray(g.hist)?g.hist:[]).slice(0,30).map(h=>({L:LETTERS.includes(h&&h.L)?h.L:'?',s:(Array.isArray(h&&h.s)?h.s:[]).map(v=>+v||0)})),
     res:Array.isArray(g.res)?g.res.map(a=>Array.isArray(a)?a.map(x=>clean(x,ANSLEN)):[]):null,
@@ -278,8 +280,8 @@ async function joinGame(c,host,resumeG){
   R.onPeers(onRoomPeers,()=>{toast('Perdeu-se a ligação ao jogo.')});
   pushMe({name:myName,ans:null,an:0,f:0,stop:0,pick:null});
   if(host){
-    if(resumeG){G=resumeG;if(['play','stop','review'].includes(G.ph)){G.ph='pick';G.L=null;G.res=null;G.ov={}}}
-    else G={code:c,ph:'lobby',n:0,pk:0,L:null,cats:DEFAULT_CATS.slice(),t:90,mr:0,hard:false,used:'',ro:[],hist:[],res:null,js:'off',jz:null,jr:{},judge:true,sb:null,seq:0};
+    if(resumeG){G=resumeG;G.lv=G.lv||'medio';if(['play','stop','review'].includes(G.ph)){G.ph='pick';G.L=null;G.res=null;G.ov={}}}
+    else G={code:c,ph:'lobby',n:0,pk:0,L:null,cats:DEFAULT_CATS.slice(),t:90,mr:0,hard:false,lv:'medio',used:'',ro:[],hist:[],res:null,js:'off',jz:null,jr:{},judge:true,sb:null,seq:0};
     if(!G.ro.length)G.ro.push({p:myPeer,n:myName});else{G.ro[0].p=myPeer;G.ro[0].n=myName}
     publishGame();
   }
@@ -358,7 +360,7 @@ function hostStart(){
     judgeWarm=true;
     sampleFn('Responde apenas com a palavra: ok',{modelTier:'quick'}).catch(e=>{
       judgeWarm=false;const c=e&&e.code;
-      if(c!=='rate_limited'&&c!=='upstream_error'&&c!=='cancelled'&&G){G.judge=false;publishGame();toast('O juiz Claude ficou desligado (sem autorização).')}
+      if(c!=='rate_limited'&&c!=='upstream_error'&&c!=='cancelled'&&G){G.judge=false;publishGame();toast('O juiz ficou desligado (sem autorização).')}
     });
   }
   G.hist=[];G.used='';G.n=(G.n||0)+1;G.pk=0;G.L=null;G.ph='pick';publishGame();
@@ -405,11 +407,12 @@ async function runJudge(n){
   const prompt=
 `És o juiz imparcial de um jogo de "Stop" (também chamado Adedonha) jogado por amigos em Angola, em português.
 A letra desta ronda é "${L}". Todas as respostas abaixo já começam por essa letra (os acentos não contam).
+Nível de exigência: ${G.lv||'medio'} (facil = aceita acentos em falta e 1 ou 2 letras erradas; medio = aceita acentos em falta mas não outros erros; dificil = ortografia exacta).
 
 Para cada resposta decide se é VÁLIDA para a sua categoria:
 - Tem de ser uma palavra ou nome real que pertença claramente à categoria (ex.: em "Fruto" tem de ser um fruto; em "País" um país que existe; em "Celebridade" uma pessoa famosa real).
 - Em "Nome" aceita qualquer nome próprio de pessoa usado em qualquer país.
-- Aceita grafias de Angola, Portugal e Brasil, plurais, e pequenos erros de ortografia quando se percebe bem a palavra.
+- Aceita grafias de Angola, Portugal e Brasil (incluindo a grafia anterior ao Acordo Ortográfico) e plurais. Os erros de ortografia seguem o nível de exigência.
 - Conhece e aceita termos e nomes angolanos: frutos como múcua, gajaja, maboque, mirangolo, loengo; lugares, bairros e províncias de Angola; artistas, desportistas e figuras angolanas.
 - Rejeita: palavras inventadas ou sem sentido, letras ao calhas, palavras que existem mas não pertencem à categoria, o próprio nome da categoria, e respostas demasiado vagas.
 - Se houver uma dúvida razoável e a resposta for plausível, aceita.
@@ -519,7 +522,8 @@ function vHome(){
     <li>Em cada ronda um jogador escolhe a letra (ou sorteia). Todos preenchem as colunas com palavras começadas por essa letra.</li>
     <li>Quem preencher tudo primeiro carrega no <b>STOP</b> e a escrita pára em todos os telemóveis.</li>
     <li><b>10 pontos</b> para uma resposta que mais ninguém deu, <b>5</b> se outro escreveu a mesma, <b>0</b> em branco ou inválida. Os acentos não contam.</li>
-    <li>⚖️ No fim de cada ronda o <b>juiz Claude</b> avalia as respostas: inventadas ou fora da categoria valem 0.</li>
+    <li>⚖️ No fim de cada ronda o <b>juiz</b> confirma as respostas no dicionário e nas listas (países, cores, animais, frutos, nomes, cidades): inventadas, fora da categoria ou mal escritas valem 0.</li>
+    <li>🎯 Há 3 níveis: no <b>Fácil</b> aceitam-se acentos em falta e pequenos erros; no <b>Médio</b> só os acentos em falta; no <b>Difícil</b> nenhum erro.</li>
     <li>🗳️ Se discordarem do juiz, os outros jogadores podem votar para mudar a decisão (ninguém vota nas próprias respostas).</li>
   </ul></details></div>
   <div class="dock"><div class="inner"><button class="btn red big" data-a="host">Criar novo jogo</button></div></div>`;
@@ -546,11 +550,14 @@ function vLobby(){
       <div class="hint" style="margin:14px 0 6px">Número de rondas</div>
       <div class="seg">${[[0,'Livre'],[3,'3'],[5,'5'],[10,'10']].map(([v,l])=>`<button class="${G.mr===v?'on':''}" data-a="setR" data-v="${v}">${l}</button>`).join('')}</div>
       <div class="toggle"><div><b>Letras difíceis</b><div class="hint">Incluir K, W, X e Y</div></div><button class="sw ${G.hard?'on':''}" data-a="toggleHard" aria-label="Letras difíceis"></button></div>
-      <div class="toggle"><div><b>⚖️ Juiz Claude</b><div class="hint">${sampleFn===null?'Não disponível neste telemóvel: as respostas serão decididas por votos.':'No fim de cada ronda a Claude anula respostas inventadas ou fora da categoria.'}</div></div><button class="sw ${G.judge&&sampleFn!==null?'on':''}" data-a="toggleJudge" aria-label="Juiz Claude" ${sampleFn===null?'disabled':''}></button></div></div>
+      <div class="toggle"><div><b>⚖️ Juiz (dicionário)</b><div class="hint">${sampleFn===null?'Não disponível agora: as respostas serão decididas por votos.':'No fim de cada ronda o juiz anula respostas inventadas, fora da categoria ou mal escritas.'}</div></div><button class="sw ${G.judge&&sampleFn!==null?'on':''}" data-a="toggleJudge" aria-label="Juiz" ${sampleFn===null?'disabled':''}></button></div>
+      ${G.judge&&sampleFn!==null?`<div class="hint" style="margin:14px 0 6px">Nível de dificuldade</div>
+      <div class="seg">${LEVELS.map(([v,l])=>`<button class="${G.lv===v?'on':''}" data-a="setLv" data-v="${v}">${l}</button>`).join('')}</div>
+      <p class="hint" style="margin-top:6px">${esc((LEVELS.find(l=>l[0]===G.lv)||LEVELS[1])[2])}</p>`:''}</div>
     <div class="dock"><div class="note">${G.ro.length<2?'À espera de pelo menos mais 1 jogador…':'Toda a gente entrou? Então bora!'}</div><div class="inner"><button class="btn red big" data-a="start" ${G.ro.length<2?'disabled':''}>Começar jogo</button></div></div>`;
   }else{
     html+=`<div class="card"><h2>Colunas</h2><div class="chips">${G.cats.map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</div>
-      <p class="hint" style="margin-top:12px">${G.t?'Tempo máximo: '+fmt(G.t)+' por ronda':'Sem limite de tempo'}${G.mr?' · '+G.mr+' rondas':''}</p><p class="hint">${G.judge?'⚖️ Juiz: Claude avalia as respostas no fim de cada ronda.':'🗳️ As respostas duvidosas são decididas por votos.'}</p></div>
+      <p class="hint" style="margin-top:12px">${G.t?'Tempo máximo: '+fmt(G.t)+' por ronda':'Sem limite de tempo'}${G.mr?' · '+G.mr+' rondas':''}</p><p class="hint">${G.judge?'⚖️ Juiz: dicionário, nível '+lvName(G.lv)+'.':'🗳️ As respostas duvidosas são decididas por votos.'}</p></div>
       <div class="center"><div class="wait">⏳</div><p class="hint">À espera que <b>${esc(G.ro[0].n)}</b> comece o jogo…</p></div>`;
   }
   return {key,html};
@@ -602,8 +609,8 @@ function vReview(){
   const elig=Math.max(0,presentIdx(G).length-1);
   const need=G.js==='done'?Math.max(2,Math.floor(elig/2)+1):Math.max(1,Math.floor(elig/2)+1);
   let banner='';
-  if(G.js==='busy')banner=`<div class="card judge"><div class="spin" style="margin:0"></div><div><b>⚖️ O juiz Claude está a avaliar as respostas…</b><div class="hint">Demora alguns segundos.</div></div></div>`;
-  else if(G.js==='done')banner=`<div class="card judge ok"><div class="jico">⚖️</div><div><b>O juiz já avaliou.</b><div class="hint">${elig>=2?`Discordas? Toca numa resposta de outro jogador para a contestar. São precisos ${need} votos para mudar a decisão.`:'Com 2 jogadores, a decisão do juiz é final.'}</div></div></div>`;
+  if(G.js==='busy')banner=`<div class="card judge"><div class="spin" style="margin:0"></div><div><b>⚖️ O juiz está a verificar as respostas…</b><div class="hint">Demora alguns segundos.</div></div></div>`;
+  else if(G.js==='done')banner=`<div class="card judge ok"><div class="jico">⚖️</div><div><b>O juiz já avaliou (nível ${lvName(G.lv)}).</b><div class="hint">${elig>=2?`Discordas? Toca numa resposta de outro jogador para a contestar. São precisos ${need} votos para mudar a decisão.`:'Com 2 jogadores, a decisão do juiz é final.'}</div></div></div>`;
   else banner=`<div class="card judge off"><div class="jico">🗳️</div><div><b>Sem juiz nesta ronda.</b><div class="hint">A app só confirma a letra. Toca nas respostas de outros jogadores que achas inválidas: com ${need} voto${need>1?'s':''} a resposta é anulada.</div></div></div>`;
   const busy=G.js==='busy';
   const html=gameTop()+`<div class="center" style="margin-bottom:14px"><div class="eyebrow">Correcção · Ronda ${G.hist.length+1}</div><div class="who" style="margin:4px 0 0">Letra <span class="hand" style="font-size:40px">${G.L}</span></div>
@@ -708,6 +715,7 @@ const A={
   setT:d=>setG(()=>G.t=+d.v),
   setR:d=>setG(()=>G.mr=+d.v),
   toggleHard:()=>setG(()=>G.hard=!G.hard),
+  setLv:d=>{if(LEVELS.some(l=>l[0]===d.v))setG(()=>G.lv=d.v)},
   toggleJudge:()=>{if(sampleFn===null)return;setG(()=>G.judge=!G.judge)},
   start:()=>{if(isHost)hostStart()},
   pick:d=>doPick(d.v),

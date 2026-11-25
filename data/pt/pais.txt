@@ -1,0 +1,245 @@
+# Países (e nomes alternativos comuns). Uma entrada por linha; os acentos são verificados conforme o nível.
+Afeganistão
+África do Sul
+Albânia
+Alemanha
+Andorra
+Angola
+Antígua e Barbuda
+Arábia Saudita
+Argélia
+Argentina
+Arménia
+Armênia
+Austrália
+Áustria
+Azerbaijão
+Baamas
+Bahamas
+Bangladesh
+Barbados
+Barém
+Bahrein
+Bielorrússia
+Bélgica
+Belize
+Benim
+Benin
+Bolívia
+Bósnia e Herzegovina
+Bósnia
+Botsuana
+Botswana
+Brasil
+Brunei
+Bulgária
+Burquina Faso
+Burkina Faso
+Burúndi
+Burundi
+Butão
+Cabo Verde
+Camarões
+Camboja
+Canadá
+Catar
+Qatar
+Cazaquistão
+Chade
+Chile
+China
+Chipre
+Colômbia
+Comores
+Congo
+República do Congo
+República Democrática do Congo
+Coreia do Norte
+Coreia do Sul
+Coreia
+Costa do Marfim
+Costa Rica
+Croácia
+Cuba
+Dinamarca
+Djibuti
+Dominica
+Egipto
+Egito
+El Salvador
+Salvador
+Emirados Árabes Unidos
+Emirados
+Equador
+Eritreia
+Escócia
+Eslováquia
+Eslovénia
+Eslovênia
+Espanha
+Estados Unidos
+Estados Unidos da América
+América
+Estónia
+Estônia
+Essuatíni
+Suazilândia
+Etiópia
+Fiji
+Filipinas
+Finlândia
+França
+Gabão
+Gâmbia
+Gana
+Geórgia
+Granada
+Grécia
+Guatemala
+Guiana
+Guiné
+Guiné-Bissau
+Guiné Equatorial
+Haiti
+Holanda
+Honduras
+Hungria
+Iémen
+Iêmen
+Índia
+Indonésia
+Inglaterra
+Irão
+Irã
+Iraque
+Irlanda
+Islândia
+Israel
+Itália
+Jamaica
+Japão
+Jordânia
+Kosovo
+Koweit
+Kuwait
+Laos
+Lesoto
+Letónia
+Letônia
+Líbano
+Libéria
+Líbia
+Listenstaine
+Liechtenstein
+Lituânia
+Luxemburgo
+Macedónia do Norte
+Macedônia do Norte
+Macedónia
+Madagáscar
+Madagascar
+Malásia
+Malávi
+Malawi
+Maldivas
+Mali
+Malta
+Marrocos
+Marshall
+Maurícia
+Maurício
+Mauritânia
+México
+Mianmar
+Birmânia
+Micronésia
+Moçambique
+Moldávia
+Mónaco
+Mônaco
+Mongólia
+Montenegro
+Namíbia
+Nauru
+Nepal
+Nicarágua
+Níger
+Nigéria
+Noruega
+Nova Zelândia
+Omã
+Países Baixos
+País de Gales
+Palau
+Palestina
+Panamá
+Papua-Nova Guiné
+Paquistão
+Paraguai
+Peru
+Polónia
+Polônia
+Portugal
+Quénia
+Quênia
+Quirguistão
+Quiribáti
+Reino Unido
+República Centro-Africana
+República Checa
+República Tcheca
+Chéquia
+Tchéquia
+República Dominicana
+Roménia
+Romênia
+Ruanda
+Rússia
+Salomão
+Samoa
+Santa Lúcia
+São Cristóvão e Neves
+São Marino
+São Tomé e Príncipe
+São Tomé
+São Vicente e Granadinas
+Seicheles
+Senegal
+Serra Leoa
+Sérvia
+Singapura
+Síria
+Somália
+Sri Lanka
+Sudão
+Sudão do Sul
+Suécia
+Suíça
+Suriname
+Tailândia
+Taiwan
+Tajiquistão
+Tanzânia
+Timor-Leste
+Timor
+Togo
+Tonga
+Trindade e Tobago
+Tunísia
+Turquemenistão
+Turquia
+Tuvalu
+Ucrânia
+Uganda
+Uruguai
+Usbequistão
+Uzbequistão
+Vanuatu
+Vaticano
+Venezuela
+Vietname
+Vietnã
+Zâmbia
+Zimbabué
+Zimbabwe
+Zimbábue

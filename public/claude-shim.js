@@ -90,7 +90,8 @@
     let x;
     while ((x = re.exec(p))) { try { items[+x[1]] = { c: JSON.parse(x[2]), raw: JSON.parse(x[3]) }; } catch (e) { return null; } }
     if (!items.length || items.some(i => !i)) return null;
-    return { L: m[1], items };
+    const lv = /Nível de exigência: (facil|medio|dificil)/.exec(p);
+    return { L: m[1], items, level: lv ? lv[1] : 'medio' };
   }
   function currentGameRoom() { for (const n of handles.keys()) if (n.startsWith('stop-')) return n; return null; }
 
@@ -104,7 +105,7 @@
     const room = currentGameRoom();
     if (!room) throw { code: 'not_joined' };
     const r = await new Promise((res, rej) => {
-      socket.timeout(90000).emit('judge', { room, L: parsed.L, items: parsed.items }, (e, r) => {
+      socket.timeout(20000).emit('judge', { room, L: parsed.L, items: parsed.items, level: parsed.level }, (e, r) => {
         if (e) return rej({ code: 'upstream_error' });
         if (r && r.error) return rej({ code: r.error });
         res(r);

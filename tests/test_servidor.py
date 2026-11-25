@@ -3,7 +3,7 @@
     npm install
     python tests/test_servidor.py      # esperado: Carla 30, Ana 25, João 5 (sem juiz: João 15)
 
-Arranca o servidor com STOP_FAKE_JUDGE=1 (o juiz não chama a API: palavras com "zz" são inválidas).
+Arranca o servidor local; o juiz por dicionário anula o "Azzzz" do João (não é um fruto).
 Para testar contra um servidor já a correr: STOP_URL=https://... python tests/test_servidor.py
 """
 import os, subprocess, sys, time, urllib.request, tempfile
@@ -14,7 +14,7 @@ URL = os.environ.get('STOP_URL')
 proc = None
 if not URL:
     port = '3999'
-    env = dict(os.environ, PORT=port, STOP_FAKE_JUDGE='1')
+    env = dict(os.environ, PORT=port)
     proc = subprocess.Popen(['node', 'server.js'], cwd=ROOT, env=env)
     URL = 'http://localhost:' + port
     for _ in range(50):
