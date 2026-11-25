@@ -13,6 +13,7 @@ const PRESENCE_MAX = 4096;          // igual ao limite da Claude
 const ROOM_MAX_PEERS = 16;          // 10 jogadores + folga para quem recarrega
 const LOBBY_LIST_MAX = 40;          // jogos mostrados em "Jogos abertos"
 const ROOM_RE = /^(lobby|stop-[a-z0-9]{3,8})$/;
+const PUB_MAX = 8;                  // jogadores por sala pública
 
 // Caracteres de controlo e invisíveis (escritos como escapes ASCII de propósito).
 const CTRL_RE = new RegExp('[\\u0000-\\u001f\\u007f-\\u009f\\u00ad\\u200b-\\u200f\\u2028-\\u202e\\u2060-\\u206f\\ufeff]', 'g');
@@ -125,6 +126,13 @@ io.on('connection', socket => {
     if (typeof ack === 'function') ack({ ok: true });
   });
 
+  // "Jogar agora": escolhe uma sala pública com lugar ou cria uma nova (quem a cria é o anfitrião).
+  socket.on('quick', (msg, ack) => {
+    if (typeof ack !== 'function') return;
+    if (!take(joinB)) return ack({ error: 'rate_limited' });
+    ack(quickMatch());
+  });
+
   socket.on('judge', async (msg, ack) => {
     if (typeof ack !== 'function') return;
     try {
@@ -141,6 +149,39 @@ io.on('connection', socket => {
     if (livePeers.get(peer) === socket.id) livePeers.delete(peer);
   });
 });
+
+/* ================= salas públicas ================= */
+const reserved = new Map(); // código -> {t, n}: salas acabadas de criar, ainda sem jogo publicado
+function publicGame(name) {
+  const r = rooms.get(name); if (!r) return null;
+  for (const v of r.values()) { const g = v.presence && v.presence.game; if (g && g.pub) return g; }
+  return null;
+}
+function newCode() {
+  const a = 'abcdefghjkmnpqrstuvwxyz23456789'; let c;
+  do { c = ''; for (let i = 0; i < 4; i++) c += a[crypto.randomInt(a.length)]; } while (rooms.has('stop-' + c) || reserved.has(c));
+  return c;
+}
+function quickMatch() {
+  const now = Date.now();
+  let best = null, bestScore = -1;
+  for (const name of rooms.keys()) {
+    if (!name.startsWith('stop-')) continue;
+    const g = publicGame(name); if (!g) continue;
+    const np = Array.isArray(g.ro) ? g.ro.length : 0, mr = +g.mr || 0, done = Array.isArray(g.hist) ? g.hist.length : 0;
+    if (np >= PUB_MAX || g.ph === 'final' || (mr && done >= mr - 1)) continue;
+    const score = (g.ph === 'lobby' ? 100 : 0) + np; // primeiro as salas à espera, as mais cheias primeiro
+    if (score > bestScore) { best = name.slice(5); bestScore = score; }
+  }
+  for (const [c, v] of reserved) {
+    if (now - v.t > 20000 || publicGame('stop-' + c)) { reserved.delete(c); continue; }
+    if (v.n < PUB_MAX && 100 + v.n > bestScore) { best = c; bestScore = 100 + v.n; }
+  }
+  if (best) { const v = reserved.get(best); if (v) v.n++; return { ok: true, code: best, host: false }; }
+  const code = newCode();
+  reserved.set(code, { t: now, n: 1 });
+  return { ok: true, code, host: true };
+}
 
 /* ================= juiz (dicionário) ================= */
 const err = code => Object.assign(new Error(code), { code });

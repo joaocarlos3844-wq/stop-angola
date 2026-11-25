@@ -114,6 +114,9 @@
     return r.out;
   };
 
+  // Funções que só existem no nosso servidor (fora da Claude).
+  window.stopServer = { quick: async () => { await ready; return call('quick', {}); } };
+
   window.claude = {
     use: async n => {
       if (n === 'room') return openRoom('lobby');

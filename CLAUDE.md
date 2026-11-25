@@ -18,6 +18,8 @@ Jogo multijogador de "Stop" (Adedonha) para telemóvel. Cada jogador joga no seu
 - **Votação**: um jogador contesta respostas dos outros (`vt.k = ["i.c", ...]`). Com o juiz activo é preciso `max(2, maioria dos outros presentes)`; sem juiz basta a maioria. Nas próprias respostas não se vota.
 - **Juiz** (`runJudge()`): corre só no dispositivo do anfitrião. Deduplica (categoria + resposta) e envia uma única prompt JSON. O pedido de "aquecimento" em `hostStart()` faz a Claude pedir o consentimento no clique.
 - O render usa uma `key` por ecrã para não redesenhar (nem perder o foco) enquanto se escreve.
+- **Quem dirige** é `G.ro[G.h]` (não é sempre o índice 0). Se essa pessoa desaparecer da sala durante mais de 4,5 s, `tryTakeOver()` passa a direcção ao primeiro jogador presente pela ordem do roster, que retoma a fase em que estava (temporizador, recolha das respostas, juiz). Se o antigo anfitrião voltar e "continuar o jogo", ao ver outro anfitrião passa a jogador.
+- **Salas públicas** (`G.pub`): regras fixas (colunas por omissão, 1:30, 5 rondas, nível Médio), até 8 jogadores, e `autoPlan()` avança sozinho: começa 40/20/10/5 s depois de haver 2/3/4/6 jogadores, sorteia a letra ao fim de 15 s, confirma os pontos ao fim de 30 s e passa à ronda seguinte ao fim de 12 s. O tempo que falta vai em `G.au` e os ecrãs mostram-no em `[data-auto]`. Só as salas públicas publicam `hosting` no lobby (lista "Salas públicas abertas"); as **privadas** só se encontram pelo código.
 
 ## Versão pública (fora da Claude): feita
 
@@ -33,7 +35,8 @@ Jogo multijogador de "Stop" (Adedonha) para telemóvel. Cada jogador joga no seu
   - O juiz Claude no servidor foi removido (está no histórico do git, commit 7f55a3a).
 - PWA: `public/manifest.webmanifest`, ícones e `sw.js` (rede primeiro; só é registado em https).
 - Alojamento: `render.yaml` (Render, plano free), sem variáveis obrigatórias. Cada `git push` para `main` volta a publicar.
-- Próximas fases: (2) salas públicas com emparelhamento automático e o jogo controlado pelo servidor; (3) versões em PT-BR, inglês, francês, italiano e espanhol (os dicionários `@cspell/dict-*` ocupam ~50 MB de memória cada).
+- "Jogar agora": `window.stopServer.quick()` (só existe no shim) chama o evento `quick`; `quickMatch()` no servidor escolhe a sala pública com lugar (primeiro as que estão à espera, as mais cheias primeiro, e as acabadas de criar em `reserved`) ou devolve um código novo e quem pediu passa a anfitrião. Se o jogo não aparecer em 9 s, o cliente volta a procurar (até 3 vezes).
+- Próximas fases: (3) versões em PT-BR, inglês, francês, italiano e espanhol (os dicionários `@cspell/dict-*` ocupam ~50 MB de memória cada).
 
 ## Testes
 
@@ -41,7 +44,8 @@ Jogo multijogador de "Stop" (Adedonha) para telemóvel. Cada jogador joga no seu
 npm install
 pip install playwright && python -m playwright install chromium
 node tests/test_dicionario.js      # juiz por dicionário: 50 respostas x 3 níveis
-python tests/test_servidor.py      # servidor real + 3 browsers, juiz por dicionário
+python tests/test_servidor.py      # sala privada: servidor real + 3 browsers, juiz por dicionário
+python tests/test_publico.py       # sala pública: emparelhamento, início automático e troca de anfitrião (~1,5 min)
 python -m http.server 8765         # noutro terminal, para o teste com mock:
 python tests/test_ronda.py
 # resultado esperado nos dois: Carla 30, Ana 25, João 5

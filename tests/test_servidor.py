@@ -1,4 +1,4 @@
-"""Joga uma ronda completa contra o servidor real (server.js), com 3 browsers separados.
+"""Joga uma ronda completa numa sala privada contra o servidor real (server.js), com 3 browsers separados.
 
     npm install
     python tests/test_servidor.py      # esperado: Carla 30, Ana 25, João 5 (sem juiz: João 15)
@@ -41,8 +41,9 @@ try:
         A.fill('#myname', 'Ana'); A.click('[data-a=host]')
         A.wait_for_selector('.bigcode')
         code = A.inner_text('.bigcode').strip().lower()
-        # B entra pela lista "Jogos abertos", C pelo código
-        B.fill('#myname', 'João'); B.wait_for_selector(f'[data-a=join][data-v="{code}"]', timeout=5000); B.click(f'[data-a=join][data-v="{code}"]')
+        # sala privada: não aparece na lista; B e C entram pelo código
+        assert B.locator(f'[data-a=join][data-v="{code}"]').count() == 0
+        B.fill('#myname', 'João'); B.fill('#jcode', code); B.click('[data-a=joinCode]')
         C.fill('#myname', 'Carla'); C.fill('#jcode', code); C.click('[data-a=joinCode]')
         A.wait_for_function("document.querySelectorAll('.chips .chip').length>=3", timeout=8000)
         for _ in range(4): A.click('[data-a=rmCat][data-i="3"]'); A.wait_for_timeout(150)

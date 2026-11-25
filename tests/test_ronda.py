@@ -6,8 +6,9 @@ with sync_playwright() as p:
     for pg in pages: pg.on('pageerror',lambda e:errs.append(str(e))); pg.goto('http://localhost:8765/index.html'); pg.wait_for_timeout(300)
     A,B,C=pages
     A.fill('#myname','Ana'); A.click('[data-a=host]'); A.wait_for_timeout(600)
+    code=A.inner_text('.bigcode').strip()
     for pg,n in ((B,'João'),(C,'Carla')):
-        pg.fill('#myname',n); pg.wait_for_timeout(200); pg.click('[data-a=join]'); pg.wait_for_timeout(600)
+        pg.fill('#myname',n); pg.fill('#jcode',code); pg.click('[data-a=joinCode]'); pg.wait_for_timeout(600)
     for _ in range(4): A.click('[data-a=rmCat][data-i="3"]'); A.wait_for_timeout(150)
     A.screenshot(path=__import__('os').path.join(__import__('tempfile').gettempdir(),'j0.png'),full_page=True)
     A.click('[data-a=start]'); A.wait_for_timeout(500); A.click('[data-a=pick][data-v=A]'); A.wait_for_timeout(4300)
