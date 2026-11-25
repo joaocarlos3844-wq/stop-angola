@@ -7,6 +7,12 @@ Depois de uma ronda, quem dirige o jogo sai e outro jogador passa a dirigir; a r
 import os, subprocess, sys, time, urllib.request
 from playwright.sync_api import sync_playwright
 
+def entrar(pg, modo, lingua=None):
+    """Percorre o ecrã inicial: boas-vindas -> língua (a escolhida ou a do browser) -> sala pública/privada."""
+    pg.wait_for_selector('[data-a=hs][data-v=lang]', timeout=15000); pg.click('[data-a=hs][data-v=lang]')
+    pg.click(f'[data-a=lang][data-v={lingua}]' if lingua else '.choice.on')
+    pg.click(f'[data-a=hs][data-v={modo}]'); pg.wait_for_selector('#myname')
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 URL = os.environ.get('STOP_URL')
 proc = None
@@ -30,7 +36,7 @@ try:
         for nome in ('Ana', 'João', 'Carla'):
             ctx = b.new_context(viewport={'width': 390, 'height': 844}, locale='pt-PT')
             pg = ctx.new_page(); pg.on('pageerror', lambda e: errs.append(str(e)))
-            pg.goto(URL + '/'); pg.wait_for_selector('#myname', timeout=15000)
+            pg.goto(URL + '/'); entrar(pg, 'pub')
             pg.fill('#myname', nome); pages.append(pg)
         A, B, C = pages
         # sala privada de outra pessoa não pode apanhar ninguém do "Jogar agora"
@@ -45,7 +51,7 @@ try:
         assert 'Jogadores (3/3)' in A.inner_text('body')
         # um 4.º jogador que quer uma sala de 4 vai para outra sala
         D = b.new_context(viewport={'width': 390, 'height': 844}, locale='pt-PT').new_page()
-        D.goto(URL + '/'); D.wait_for_selector('#myname'); D.fill('#myname', 'Dora')
+        D.goto(URL + '/'); entrar(D, 'pub'); D.fill('#myname', 'Dora')
         for _ in range(2): D.click('[data-a=step][data-k=size][data-d="-1"]'); D.wait_for_timeout(100)
         D.click('[data-a=quick]'); D.wait_for_selector('.bigcode', timeout=15000)
         print('Sala da Dora (4 jogadores):', code_of(D))

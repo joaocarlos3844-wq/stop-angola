@@ -42,8 +42,12 @@
         const o = { ...st.mine };
         for (const k in patch) { if (patch[k] === null) delete o[k]; else o[k] = patch[k]; }
         if (new TextEncoder().encode(JSON.stringify(o)).length > 4096) throw { code: 'invalid_argument' };
-        st.mine = o; fire();
-        if (st.joined) await call('presence', { room: name, patch });
+        st.mine = o;
+        // Enviar ANTES de avisar o jogo: o aviso pode publicar outra presence (o anfitrião reage logo),
+        // e essa tem de chegar ao servidor depois desta, senão fica lá a versão antiga.
+        const sent = st.joined ? call('presence', { room: name, patch }) : null;
+        fire();
+        if (sent) await sent;
       },
       peers: () => st.cached,
       onPeers: (h, onErr) => {

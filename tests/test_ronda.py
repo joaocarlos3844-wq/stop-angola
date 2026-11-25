@@ -1,9 +1,15 @@
 from playwright.sync_api import sync_playwright
+
+def entrar(pg, modo, lingua=None):
+    """Percorre o ecrã inicial: boas-vindas -> língua (a escolhida ou a do browser) -> sala pública/privada."""
+    pg.wait_for_selector('[data-a=hs][data-v=lang]', timeout=15000); pg.click('[data-a=hs][data-v=lang]')
+    pg.click(f'[data-a=lang][data-v={lingua}]' if lingua else '.choice.on')
+    pg.click(f'[data-a=hs][data-v={modo}]'); pg.wait_for_selector('#myname')
 with sync_playwright() as p:
     b=p.chromium.launch(); ctx=b.new_context(viewport={'width':390,'height':844},locale='pt-PT')
     ctx.add_init_script(path=__import__('os').path.join(__import__('os').path.dirname(__file__),'mock-claude.js'))
     errs=[]; pages=[ctx.new_page() for _ in range(3)]
-    for pg in pages: pg.on('pageerror',lambda e:errs.append(str(e))); pg.goto('http://localhost:8765/index.html'); pg.wait_for_timeout(300)
+    for pg in pages: pg.on('pageerror',lambda e:errs.append(str(e))); pg.goto('http://localhost:8765/index.html'); entrar(pg,'priv')
     A,B,C=pages
     A.fill('#myname','Ana'); A.click('[data-a=host]'); A.wait_for_timeout(600)
     code=A.inner_text('.bigcode').strip()

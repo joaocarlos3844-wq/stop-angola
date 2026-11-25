@@ -6,6 +6,12 @@ troca de língua no ecrã inicial e "Jogar agora" que só junta jogadores da mes
 import os, subprocess, sys, time, urllib.request
 from playwright.sync_api import sync_playwright
 
+def entrar(pg, modo, lingua=None):
+    """Percorre o ecrã inicial: boas-vindas -> língua (a escolhida ou a do browser) -> sala pública/privada."""
+    pg.wait_for_selector('[data-a=hs][data-v=lang]', timeout=15000); pg.click('[data-a=hs][data-v=lang]')
+    pg.click(f'[data-a=lang][data-v={lingua}]' if lingua else '.choice.on')
+    pg.click(f'[data-a=hs][data-v={modo}]'); pg.wait_for_selector('#myname')
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 URL = os.environ.get('STOP_URL')
 proc = None
@@ -32,11 +38,13 @@ try:
         def page(locale):
             pg = b.new_context(viewport={'width': 390, 'height': 844}, locale=locale).new_page()
             pg.on('pageerror', lambda e: errs.append(str(e)))
-            pg.goto(URL + '/'); pg.wait_for_selector('#myname', timeout=15000)
+            pg.goto(URL + '/'); pg.wait_for_selector('[data-a=hs][data-v=lang]', timeout=15000)
             return pg
         A, B, C = page('fr-FR'), page('en-US'), page('fr-FR')
-        check('Jouer maintenant' in A.inner_text('body'), 'interface em francês')
-        check('Play now' in B.inner_text('body'), 'interface em inglês')
+        check('Bienvenue dans Stop' in A.inner_text('body'), 'boas-vindas em francês')
+        check('Welcome to Stop' in B.inner_text('body'), 'boas-vindas em inglês')
+        for pg in (A, B, C): entrar(pg, 'priv')
+        check('Salon privé' in A.inner_text('body') and 'Private room' in B.inner_text('body'), 'passos traduzidos')
         A.fill('#myname', 'Ana'); A.click('[data-a=host]'); A.wait_for_selector('.bigcode')
         code = A.inner_text('.bigcode').strip()
         check('Prénom' in A.inner_text('body') and 'Couleur' in A.inner_text('body'), 'colunas em francês')
@@ -61,12 +69,13 @@ try:
         check('Ana +30' in res and 'Carla (toi) +30' in res and 'Bob +20' in res, 'pontos Ana 30, Carla 30, Bob 20')
         # troca de língua no ecrã inicial
         D = page('pt-PT')
-        D.select_option('#uilang', 'es'); D.wait_for_timeout(300)
-        check('Jugar ahora' in D.inner_text('body'), 'mudar a língua para espanhol')
-        D.reload(); D.wait_for_selector('#myname')
-        check('Jugar ahora' in D.inner_text('body'), 'a língua fica guardada')
+        D.click('[data-a=hs][data-v=lang]'); D.click('[data-a=lang][data-v=es]'); D.wait_for_timeout(300)
+        check('¿Cómo quieres jugar?' in D.inner_text('body'), 'escolher espanhol no passo da língua')
+        D.reload(); D.wait_for_selector('[data-a=hs][data-v=lang]')
+        check('Bienvenido a Stop' in D.inner_text('body'), 'a língua fica guardada')
+        entrar(D, 'pub')
         # "Jogar agora" não junta línguas diferentes
-        E = page('pt-PT')
+        E = page('pt-PT'); entrar(E, 'pub')
         D.fill('#myname', 'Diego'); D.click('[data-a=quick]'); D.wait_for_selector('.bigcode')
         E.fill('#myname', 'Eva'); E.click('[data-a=quick]'); E.wait_for_selector('.bigcode')
         cd, ce = D.inner_text('.bigcode'), E.inner_text('.bigcode')

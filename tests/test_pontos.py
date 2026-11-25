@@ -10,6 +10,12 @@ Colunas Nome, Fruto, Comida, letra A, 3 jogadores:
 import os, subprocess, sys, time, urllib.request
 from playwright.sync_api import sync_playwright
 
+def entrar(pg, modo, lingua=None):
+    """Percorre o ecrã inicial: boas-vindas -> língua (a escolhida ou a do browser) -> sala pública/privada."""
+    pg.wait_for_selector('[data-a=hs][data-v=lang]', timeout=15000); pg.click('[data-a=hs][data-v=lang]')
+    pg.click(f'[data-a=lang][data-v={lingua}]' if lingua else '.choice.on')
+    pg.click(f'[data-a=hs][data-v={modo}]'); pg.wait_for_selector('#myname')
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 URL = os.environ.get('STOP_URL')
 proc = None
@@ -35,7 +41,7 @@ try:
         def page(nome):
             pg = b.new_context(viewport={'width': 390, 'height': 844}, locale='pt-PT').new_page()
             pg.on('pageerror', lambda e: errs.append(str(e)))
-            pg.goto(URL + '/'); pg.wait_for_selector('#myname', timeout=15000); pg.fill('#myname', nome)
+            pg.goto(URL + '/'); entrar(pg, 'priv'); pg.fill('#myname', nome)
             return pg
         A, B, C = page('Ana'), page('João'), page('Carla')
         A.click('[data-a=host]'); A.wait_for_selector('.bigcode'); code = A.inner_text('.bigcode').strip()
