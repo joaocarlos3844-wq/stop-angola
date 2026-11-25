@@ -91,7 +91,8 @@
     while ((x = re.exec(p))) { try { items[+x[1]] = { c: JSON.parse(x[2]), raw: JSON.parse(x[3]) }; } catch (e) { return null; } }
     if (!items.length || items.some(i => !i)) return null;
     const lv = /Nível de exigência: (facil|medio|dificil)/.exec(p);
-    return { L: m[1], items, level: lv ? lv[1] : 'medio' };
+    const lg = /Língua do jogo: (pt|br|en|fr|it|es)/.exec(p);
+    return { L: m[1], items, level: lv ? lv[1] : 'medio', lang: lg ? lg[1] : 'pt' };
   }
   function currentGameRoom() { for (const n of handles.keys()) if (n.startsWith('stop-')) return n; return null; }
 
@@ -105,7 +106,7 @@
     const room = currentGameRoom();
     if (!room) throw { code: 'not_joined' };
     const r = await new Promise((res, rej) => {
-      socket.timeout(20000).emit('judge', { room, L: parsed.L, items: parsed.items, level: parsed.level }, (e, r) => {
+      socket.timeout(20000).emit('judge', { room, L: parsed.L, items: parsed.items, level: parsed.level, lang: parsed.lang }, (e, r) => {
         if (e) return rej({ code: 'upstream_error' });
         if (r && r.error) return rej({ code: r.error });
         res(r);
@@ -115,7 +116,7 @@
   };
 
   // Funções que só existem no nosso servidor (fora da Claude).
-  window.stopServer = { quick: async () => { await ready; return call('quick', {}); } };
+  window.stopServer = { quick: async lang => { await ready; return call('quick', { lang }); } };
 
   window.claude = {
     use: async n => {

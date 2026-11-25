@@ -1,0 +1,31 @@
+# Città
+Bari
+Bergamo
+Bologna
+Brescia
+Cagliari
+Catania
+Firenze
+Genova
+Lisbona
+Londra
+Luanda
+Madrid
+Messina
+Milano
+Napoli
+New York
+Padova
+Palermo
+Parigi
+Parma
+Perugia
+Pisa
+Roma
+Siena
+Torino
+Trento
+Trieste
+Venezia
+Verona
+Vienna

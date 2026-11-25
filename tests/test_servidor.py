@@ -31,7 +31,7 @@ try:
         errs = []
         pages = []
         for _ in range(3):  # um contexto por "telemóvel"
-            ctx = b.new_context(viewport={'width': 390, 'height': 844})
+            ctx = b.new_context(viewport={'width': 390, 'height': 844}, locale='pt-PT')
             pg = ctx.new_page()
             pg.on('pageerror', lambda e: errs.append(str(e)))
             pg.goto(URL + '/')

@@ -1,6 +1,6 @@
 # Stop! — o jogo das letras (Angola)
 
-Jogo multijogador de "Stop" (Adedonha) para telemóvel. Cada jogador joga no seu telemóvel, um STOP pára todos e há um juiz automático (dicionário no servidor; dentro da Claude, a Claude) mais votação. Toda a interface está em **português de Angola** ("telemóvel", "objecto", "facto"), e deve continuar assim.
+Jogo multijogador de "Stop" (Adedonha) para telemóvel. Cada jogador joga no seu telemóvel, um STOP pára todos e há um juiz automático (dicionário no servidor; dentro da Claude, a Claude) mais votação. A interface base está em **português de Angola** ("telemóvel", "objecto", "facto") e deve continuar assim; há também português do Brasil, inglês, francês, italiano e espanhol.
 
 ## Estado actual
 
@@ -36,7 +36,11 @@ Jogo multijogador de "Stop" (Adedonha) para telemóvel. Cada jogador joga no seu
 - PWA: `public/manifest.webmanifest`, ícones e `sw.js` (rede primeiro; só é registado em https).
 - Alojamento: `render.yaml` (Render, plano free), sem variáveis obrigatórias. Cada `git push` para `main` volta a publicar.
 - "Jogar agora": `window.stopServer.quick()` (só existe no shim) chama o evento `quick`; `quickMatch()` no servidor escolhe a sala pública com lugar (primeiro as que estão à espera, as mais cheias primeiro, e as acabadas de criar em `reserved`) ou devolve um código novo e quem pediu passa a anfitrião. Se o jogo não aparecer em 9 s, o cliente volta a procurar (até 3 vezes).
-- Próximas fases: (3) versões em PT-BR, inglês, francês, italiano e espanhol (os dicionários `@cspell/dict-*` ocupam ~50 MB de memória cada).
+- **Línguas** (`pt` Angola/Portugal, `br`, `en`, `fr`, `it`, `es`):
+  - Interface: `t(chave, ...)`/`tn()` no `index.html`. O português está em `S.pt` dentro do `index.html` (para continuar a funcionar dentro da Claude); as outras línguas estão em `public/i18n.js` (`window.STOP_I18N`), com as mesmas chaves. Uma chave que falte aparece em português. A língua da interface (`UI`) vem de `localStorage['stop-lang']` ou do browser e escolhe-se no ecrã inicial.
+  - Jogo: `G.lg` é a língua do jogo (dicionário, colunas `DEFCATS`/`SUGG`). As salas públicas usam a língua de quem carrega em "Jogar agora" e o servidor só junta jogadores da mesma língua; nas privadas o anfitrião escolhe (mudar repõe as colunas).
+  - Juiz: `dict.js` tem `LANG_CFG` com os dicionários `@cspell/dict-*` de cada língua e listas em `data/<língua>/`. Os países vêm do `Intl.DisplayNames` (não há listas à mão, só extras em `pais.txt`). O `br` usa o dicionário europeu, troca é/ê e ó/ô e junta `data/br/` (o dicionário brasileiro do cspell gastava ~150 MB). Os motivos de rejeição são códigos (`dict`, `pais`, `acentos`, …) traduzidos no jogo pelas chaves `r_*`. Todas as línguas carregadas gastam ~240 MB.
+  - A língua e o nível vão na prompt do juiz (`Língua do jogo: …`, `Nível de exigência: …`), que o shim lê.
 
 ## Testes
 
@@ -46,6 +50,7 @@ pip install playwright && python -m playwright install chromium
 node tests/test_dicionario.js      # juiz por dicionário: 50 respostas x 3 níveis
 python tests/test_servidor.py      # sala privada: servidor real + 3 browsers, juiz por dicionário
 python tests/test_publico.py       # sala pública: emparelhamento, início automático e troca de anfitrião (~1,5 min)
+python tests/test_linguas.py       # sala em francês com jogador em inglês, motivos traduzidos, salas públicas por língua
 python -m http.server 8765         # noutro terminal, para o teste com mock:
 python tests/test_ronda.py
 # resultado esperado nos dois: Carla 30, Ana 25, João 5

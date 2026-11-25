@@ -19,7 +19,7 @@ const PUB_MAX = 8;                  // jogadores por sala pública
 const CTRL_RE = new RegExp('[\\u0000-\\u001f\\u007f-\\u009f\\u00ad\\u200b-\\u200f\\u2028-\\u202e\\u2060-\\u206f\\ufeff]', 'g');
 
 // Juiz por dicionário (ver dict.js). O servidor só começa a aceitar ligações depois de o carregar.
-const { loadLang, LEVELS } = require('./dict');
+const { loadLang, LEVELS, LANG_CODES } = require('./dict');
 let dict = null;
 
 /* ================= HTTP ================= */
@@ -130,7 +130,8 @@ io.on('connection', socket => {
   socket.on('quick', (msg, ack) => {
     if (typeof ack !== 'function') return;
     if (!take(joinB)) return ack({ error: 'rate_limited' });
-    ack(quickMatch());
+    const lang = LANG_CODES.includes(msg && msg.lang) ? msg.lang : 'pt';
+    ack(quickMatch(lang));
   });
 
   socket.on('judge', async (msg, ack) => {
@@ -162,24 +163,25 @@ function newCode() {
   do { c = ''; for (let i = 0; i < 4; i++) c += a[crypto.randomInt(a.length)]; } while (rooms.has('stop-' + c) || reserved.has(c));
   return c;
 }
-function quickMatch() {
+function quickMatch(lang) {
   const now = Date.now();
   let best = null, bestScore = -1;
   for (const name of rooms.keys()) {
     if (!name.startsWith('stop-')) continue;
     const g = publicGame(name); if (!g) continue;
     const np = Array.isArray(g.ro) ? g.ro.length : 0, mr = +g.mr || 0, done = Array.isArray(g.hist) ? g.hist.length : 0;
+    if ((g.lg || 'pt') !== lang) continue; // só salas da mesma língua
     if (np >= PUB_MAX || g.ph === 'final' || (mr && done >= mr - 1)) continue;
     const score = (g.ph === 'lobby' ? 100 : 0) + np; // primeiro as salas à espera, as mais cheias primeiro
     if (score > bestScore) { best = name.slice(5); bestScore = score; }
   }
   for (const [c, v] of reserved) {
     if (now - v.t > 20000 || publicGame('stop-' + c)) { reserved.delete(c); continue; }
-    if (v.n < PUB_MAX && 100 + v.n > bestScore) { best = c; bestScore = 100 + v.n; }
+    if (v.lang === lang && v.n < PUB_MAX && 100 + v.n > bestScore) { best = c; bestScore = 100 + v.n; }
   }
   if (best) { const v = reserved.get(best); if (v) v.n++; return { ok: true, code: best, host: false }; }
   const code = newCode();
-  reserved.set(code, { t: now, n: 1 });
+  reserved.set(code, { t: now, n: 1, lang });
   return { ok: true, code, host: true };
 }
 
@@ -200,15 +202,17 @@ async function judge(socket, peer, mine, b, msg) {
   const items = msg.items.map(it => ({ c: cleanStr(it && it.c, 20), raw: cleanStr(it && it.raw, 22) }));
   if (items.some(it => !it.c || !it.raw)) throw err('invalid_argument');
   const level = LEVELS.includes(msg.level) ? msg.level : 'medio';
+  const lang = LANG_CODES.includes(msg.lang) ? msg.lang : 'pt';
   if (!take(b)) throw err('rate_limited');
+  const d = lang === 'pt' ? dict : await loadLang(lang);
   return items.map((it, k) => {
-    const v = dict.check(it.c, it.raw, level);
+    const v = d.check(it.c, it.raw, level);
     return { k, ok: v.ok, r: v.r };
   });
 }
 
 loadLang('pt')
-  .then(d => { dict = d; })
+  .then(d => { dict = d; for (const l of LANG_CODES) loadLang(l).catch(e => console.error('Dicionário ' + l + ':', e.message)); })
   .catch(e => console.error('Erro a carregar o dicionário (o juiz fica desligado):', e))
   .finally(() => server.listen(PORT, () => {
     console.log(`Stop! a correr em http://localhost:${PORT} · juiz: ${dict ? 'dicionário' : 'desligado'}`);

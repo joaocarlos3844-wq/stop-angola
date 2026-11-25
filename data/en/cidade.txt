@@ -1,0 +1,66 @@
+# Cities (cities in the dictionary are also accepted)
+Amsterdam
+Athens
+Atlanta
+Auckland
+Bangkok
+Barcelona
+Beijing
+Berlin
+Birmingham
+Boston
+Brussels
+Cairo
+Cape Town
+Chicago
+Dallas
+Delhi
+Dubai
+Dublin
+Edinburgh
+Glasgow
+Hong Kong
+Houston
+Istanbul
+Johannesburg
+Kinshasa
+Lagos
+Las Vegas
+Lisbon
+Liverpool
+London
+Los Angeles
+Luanda
+Madrid
+Manchester
+Melbourne
+Mexico City
+Miami
+Milan
+Montreal
+Moscow
+Mumbai
+Nairobi
+New Delhi
+New York
+Oslo
+Paris
+Prague
+Rio de Janeiro
+Rome
+San Francisco
+Santiago
+Sao Paulo
+Seattle
+Seoul
+Shanghai
+Singapore
+Stockholm
+Sydney
+Tokyo
+Toronto
+Vancouver
+Venice
+Vienna
+Warsaw
+Washington

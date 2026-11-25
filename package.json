@@ -12,6 +12,11 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@cspell/dict-en_us": "^4.4.43",
+    "@cspell/dict-en-gb": "^5.0.38",
+    "@cspell/dict-es-es": "^3.0.9",
+    "@cspell/dict-fr-fr": "^2.3.2",
+    "@cspell/dict-it-it": "^3.1.7",
     "@cspell/dict-pt-pt": "^3.0.8",
     "cspell-trie-lib": "^10.5.2",
     "express": "^4.21.2",

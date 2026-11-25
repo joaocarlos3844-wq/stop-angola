@@ -1,0 +1,51 @@
+# Frutta
+Albicocca
+Amarena
+Ananas
+Anguria
+Arancia
+Avocado
+Banana
+Bergamotto
+Cachi
+Castagna
+Cedro
+Ciliegia
+Clementina
+Cocco
+Cocomero
+Corbezzolo
+Dattero
+Fico
+Fico d'India
+Fragola
+Frutto della passione
+Giuggiola
+Guava
+Kiwi
+Lampone
+Limone
+Lime
+Litchi
+Mandarino
+Mango
+Melagrana
+Melograno
+Mela
+Melone
+Mirtillo
+Mora
+Nespola
+Nocciola
+Noce
+Noce di cocco
+Oliva
+Papaya
+Pera
+Pesca
+Pompelmo
+Prugna
+Ribes
+Susina
+Uva
+Pomodoro

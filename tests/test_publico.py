@@ -28,7 +28,7 @@ try:
         b = p.chromium.launch()
         errs, pages = [], []
         for nome in ('Ana', 'João', 'Carla'):
-            ctx = b.new_context(viewport={'width': 390, 'height': 844})
+            ctx = b.new_context(viewport={'width': 390, 'height': 844}, locale='pt-PT')
             pg = ctx.new_page(); pg.on('pageerror', lambda e: errs.append(str(e)))
             pg.goto(URL + '/'); pg.wait_for_selector('#myname', timeout=15000)
             pg.fill('#myname', nome); pages.append(pg)

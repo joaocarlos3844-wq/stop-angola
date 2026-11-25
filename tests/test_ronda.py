@@ -1,6 +1,6 @@
 from playwright.sync_api import sync_playwright
 with sync_playwright() as p:
-    b=p.chromium.launch(); ctx=b.new_context(viewport={'width':390,'height':844})
+    b=p.chromium.launch(); ctx=b.new_context(viewport={'width':390,'height':844},locale='pt-PT')
     ctx.add_init_script(path=__import__('os').path.join(__import__('os').path.dirname(__file__),'mock-claude.js'))
     errs=[]; pages=[ctx.new_page() for _ in range(3)]
     for pg in pages: pg.on('pageerror',lambda e:errs.append(str(e))); pg.goto('http://localhost:8765/index.html'); pg.wait_for_timeout(300)
