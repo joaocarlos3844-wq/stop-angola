@@ -313,6 +313,19 @@ h1.steptitle{font-size:28px;margin:0 0 6px}
 .choice.big .tick{color:var(--ink-3);align-self:center}
 .or{display:flex;align-items:center;gap:12px;margin:22px 0 12px;color:var(--ink-3);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* ===== Créditos ===== */
+.madeby{margin-top:18px;text-align:center;font-size:13px;color:var(--ink-3)}
+.madeby button{font-weight:600;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line-2);padding:6px 4px}
+.madeby b{color:var(--ink-2);font-weight:650}
+.credits{padding:28px 24px 22px}
+.credits .mark{width:52px;height:52px;margin:0 auto 10px;display:block}
+.credits h2{font-size:22px;margin-bottom:18px}
+.credits dl{text-align:center;margin:0 0 18px}
+.credits dt{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);margin-top:16px}
+.credits dd{font-size:19px;font-weight:750;letter-spacing:-.015em;margin-top:4px}
+.credits dd small{display:block;font-size:13px;font-weight:500;color:var(--ink-2);letter-spacing:0;margin-top:2px}
+.credits .copy{font-size:12px;color:var(--ink-3);margin:0 0 16px}
 </style>
 </head>
 <body>
@@ -390,6 +403,7 @@ const S={pt:{
   timeUpX:'Acabou o tempo!',youStop:'Carregaste no STOP!',someone:'Alguém',xStop:'{0} carregou no STOP!',nameFirst:'Escreve primeiro o teu nome.',noPublic:'As salas públicas não estão disponíveis aqui.',noRoomFound:'Não foi possível encontrar uma sala ({0}).',cantResume:'Não foi possível recuperar o jogo.',
   quitT:'Sair do jogo?',quitHost:'Estás a dirigir o jogo: se saíres, outro jogador passa a dirigir.',quitNormal:'Podes voltar a entrar com o mesmo código e o mesmo nome.',yesQuit:'Sim, sair',colExists:'Essa coluna já existe.',maxCols:'Máximo de {0} colunas.',letterPicked:'Letra {0} escolhida!',
   welcomeT:'Bem-vindo ao Stop!',welcome:'O jogo das letras para jogar com os amigos, cada um no seu telemóvel.',begin:'Começar',chooseLang:'Escolhe a tua língua',chooseLangHint:'Podes mudar quando quiseres.',chooseMode:'Como queres jogar?',modePubT:'Sala pública',modePub:'Joga com pessoas de todo o lado. A partida começa sozinha.',modePrivT:'Sala privada',modePriv:'Só com os teus amigos, através de um código. Tu escolhes as regras.',
+  madeBy:'Uma criação dos {0}',credits:'Créditos',creditsCompany:'Criado por',creditsIdea:'Ideia original e direcção criativa',creditsRole:'CEO e director criativo',allRights:'Todos os direitos reservados.',close:'Fechar',
   tieHalf:'½ empate nos votos',dupHalf:'½ repetida noutra coluna',
   roomSize:'Jogadores por sala',maxPlayers:'Máximo de jogadores',playersWord:'jogadores',fullT:'Sala cheia',full:'Esta sala já tem {0} jogadores.',fullPub:'Esta sala encheu. Vamos procurar outra…',
   r_vazia:'resposta vazia',r_dict:'não existe no dicionário',r_pais:'não é um país',r_cor:'não é uma cor conhecida',r_animal:'não é um animal da lista',r_fruto:'não é um fruto da lista',r_nome:'nome desconhecido',r_cidade:'cidade desconhecida',r_acentos:'erro nos acentos',r_ortografia:'erro de ortografia'
@@ -825,6 +839,15 @@ function vNoRoom(){return {key:'noroom'+UI,html:top()+state('wifi',t('noconnT'),
 /* ----- ecrã inicial em passos: boas-vindas → língua → pública/privada → entrar ----- */
 let hs='welcome';
 const stepHead=(n,back)=>`<div class="stephead"><button class="ghost" data-a="hs" data-v="${back}">${ic('back')}${t('back')}</button><span class="steps">${[1,2,3].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</span></div>`;
+const STUDIO='Estúdios Gruta',CREATOR='João Carlos Domingos';
+function showCredits(){
+  overlay(`<div class="modal credits" role="dialog" aria-modal="true" aria-label="${t('credits')}">${MARK}<h2>Stop!</h2>
+    <dl><dt>${t('creditsCompany')}</dt><dd>${STUDIO}</dd>
+    <dt>${t('creditsIdea')}</dt><dd>${CREATOR}<small>${t('creditsRole')}</small></dd></dl>
+    <p class="copy">© ${new Date().getFullYear()} ${STUDIO}. ${t('allRights')}</p>
+    <button class="btn line big" id="mclose">${t('close')}</button></div>`);
+  const c=()=>closeOverlay();document.getElementById('mclose').onclick=c;ov.onclick=e=>{if(e.target===ov){ov.onclick=null;c()}};
+}
 function rulesCard(){return `<div class="card"><details class="rules"><summary>${ic('book')}${t('howTo')}${ic('next','chev')}</summary><ol>
     ${['r1','r2','r3','r4','r5','r6','r7'].map(k=>`<li>${t(k)}</li>`).join('')}
   </ol></details></div>`}
@@ -845,7 +868,8 @@ function vHome(){
       <h1>${t('welcomeT')}</h1>
       <p class="lead">${t('welcome')}</p>
       <button class="btn red big" data-a="hs" data-v="lang">${t('begin')}${ic('next')}</button>
-    </div>${rulesCard()}`;
+    </div>${rulesCard()}
+    <p class="madeby">${t('madeBy','<b>'+STUDIO+'</b>')} · <button data-a="credits">${t('credits')}</button></p>`;
   }else if(hs==='lang'){
     html=top()+stepHead(1,'welcome')+`<h1 class="steptitle">${t('chooseLang')}</h1><p class="hint stephint">${t('chooseLangHint')}</p>
       <div class="choices">${LANGS.map(([v,n])=>`<button class="choice ${v===UI?'on':''}" data-a="lang" data-v="${v}"><span class="lc">${v==='br'?'BR':v.toUpperCase()}</span><span class="ct">${esc(n)}</span>${v===UI?ic('check','tick'):''}</button>`).join('')}</div>`;
@@ -1073,6 +1097,7 @@ const A={
     lastKey='';render();
   },
   requeue:()=>{leaveGame();A.quick()},
+  credits:()=>showCredits(),
   hs:d=>{if(['welcome','lang','mode','pub','priv'].includes(d.v)){const el=document.getElementById('myname');if(el){myName=clean(el.value,18);lsSet('stop-name',myName)}hs=d.v;joinErr='';lastKey='';render();window.scrollTo(0,0)}},
   lang:d=>{if(!S[d.v])return;UI=d.v;lsSet('stop-lang',UI);applyLang();hs='mode';lastKey='';render();window.scrollTo(0,0)},
   step:d=>{const dd=+d.d;if(d.k==='size'){wantSize=Math.min(MAXP,Math.max(2,wantSize+dd));lsSet('stop-size',String(wantSize));lastKey='';render()}
