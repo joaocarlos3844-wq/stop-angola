@@ -149,6 +149,10 @@ class Lang {
     if (w.endsWith('es') && set.has(w.slice(0, -2))) return true;
     if (w.endsWith('oes') && set.has(w.slice(0, -3) + 'ao')) return true;
     if (w.endsWith('ões') && set.has(w.slice(0, -3) + 'ão')) return true;
+    if (w.endsWith('ães') && set.has(w.slice(0, -3) + 'ão')) return true; // cães, pães
+    if (w.endsWith('aes') && set.has(w.slice(0, -3) + 'ao')) return true;
+    if (w.endsWith('ais') && set.has(w.slice(0, -3) + 'al')) return true; // animais
+    if (w.endsWith('eis') && set.has(w.slice(0, -3) + 'el')) return true; // papéis
     return false;
   }
   listNear(set, k, max) { for (const w of set) if (w[0] === k[0] && within(k, w, max)) return true; return false; }
