@@ -14,7 +14,7 @@ Jogo multijogador de "Stop" (Adedonha) para telemóvel. Cada jogador joga no seu
 - **Protocolo só com presence** (`room.join('stop-<codigo>')`, `presence(patch)`, `peers()`, `onPeers(fn)`, `leave()`). Cada peer publica `{name, ans, an, f, stop, pick, vt}`. O anfitrião publica também `game` (o estado autoritativo `G`) e, no lobby, `hosting:{code,name,ph,np}` para a lista "Jogos abertos". O limite da presence é de 4 KiB, por isso `publishGame()` encurta as respostas e os motivos se for preciso.
 - **O anfitrião manda** (`isHost`): `hostTick()` sincroniza o roster (até 10 jogadores, religa por nome quando alguém recarrega a página), aceita a letra do jogador da vez, detecta o `stop` e recolhe as respostas 2,5 s depois (`compile()`).
 - **Fases** (`G.ph`): `lobby → pick → play → stop → review → scores → final`. `G.n` nunca volta a zero (os campos `stop`/`pick`/`vt` vêm marcados com `n`). O número da ronda mostrado é `G.hist.length+1`.
-- **Pontos** (`score(g, votesMap(g))`): 10 para resposta única, 5 para repetida, 0 se vazia, se não começa pela letra (os acentos não contam, ver `norm()`), se o juiz a anulou (`G.jz[i][c]==='0'`) ou se foi invertida por votos.
+- **Pontos** (`score(g, votesMap(g))`): 10 para resposta única, 5 para repetida, 0 se vazia, se não começa pela letra (os acentos não contam, ver `norm()`), se o juiz a anulou (`G.jz[i][c]==='0'`) ou se foi invertida por votos. Metade dos pontos (arredondado para cima) se houver **empate nos votos** (`x.tie`: metade dos que podem votar contestou) e outra metade se o jogador escreveu **a mesma palavra em várias colunas** (`x.dup`, comparada sem acentos).
 - **Votação**: um jogador contesta respostas dos outros (`vt.k = ["i.c", ...]`). Com o juiz activo é preciso `max(2, maioria dos outros presentes)`; sem juiz basta a maioria. Nas próprias respostas não se vota.
 - **Juiz** (`runJudge()`): corre só no dispositivo do anfitrião. Deduplica (categoria + resposta) e envia uma única prompt JSON. O pedido de "aquecimento" em `hostStart()` faz a Claude pedir o consentimento no clique.
 - O render usa uma `key` por ecrã para não redesenhar (nem perder o foco) enquanto se escreve.
@@ -51,6 +51,7 @@ pip install playwright && python -m playwright install chromium
 node tests/test_dicionario.js      # juiz por dicionário: 50 respostas x 3 níveis
 python tests/test_servidor.py      # sala privada: servidor real + 3 browsers, juiz por dicionário
 python tests/test_publico.py       # sala pública: emparelhamento, início automático e troca de anfitrião (~1,5 min)
+python tests/test_pontos.py        # metade dos pontos: empate nos votos e palavra repetida em duas colunas
 python tests/test_lotacao.py       # sala privada cheia e máximo de jogadores
 python tests/test_linguas.py       # sala em francês com jogador em inglês, motivos traduzidos, salas públicas por língua
 python -m http.server 8765         # noutro terminal, para o teste com mock:

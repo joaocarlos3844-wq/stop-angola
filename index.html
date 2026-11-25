@@ -116,6 +116,7 @@ details.rules li{margin-bottom:6px}
 .vd.bad{color:var(--red)}.vd.good{color:var(--green)}
 .vbtn{font-size:11px;font-weight:700;color:var(--muted);border:1.5px solid var(--line);border-radius:999px;padding:3px 8px;white-space:nowrap}
 .arow.voted .vbtn{border-color:var(--red);color:var(--red)}
+.vd.half{color:#a66a00}
 .judge{display:flex;gap:12px;align-items:center}
 .judge .jico{font-size:28px}
 .judge.ok{border-color:#bfe3cc;background:#f3fbf6}
@@ -204,10 +205,10 @@ const S={pt:{
   r1:'Uma pessoa cria o jogo e os outros entram, cada um no seu telemóvel.',
   r2:'Em cada ronda um jogador escolhe a letra (ou sorteia). Todos preenchem as colunas com palavras começadas por essa letra.',
   r3:'Quem preencher tudo primeiro carrega no <b>STOP</b> e a escrita pára em todos os telemóveis.',
-  r4:'<b>10 pontos</b> para uma resposta que mais ninguém deu, <b>5</b> se outro escreveu a mesma, <b>0</b> em branco ou inválida. Os acentos não contam.',
+  r4:'<b>10 pontos</b> para uma resposta que mais ninguém deu, <b>5</b> se outro escreveu a mesma, <b>0</b> em branco ou inválida. Os acentos não contam. A mesma palavra em duas colunas (ex.: Fruto «Maçã» e Comida «Maçã») vale <b>metade</b> em cada uma.',
   r5:'⚖️ No fim de cada ronda o <b>juiz</b> confirma as respostas no dicionário e nas listas (países, cores, animais, frutos, nomes, cidades): inventadas, fora da categoria ou mal escritas valem 0.',
   r6:'🎯 Há 3 níveis: no <b>Fácil</b> aceitam-se acentos em falta e pequenos erros; no <b>Médio</b> só os acentos em falta; no <b>Difícil</b> nenhum erro.',
-  r7:'🗳️ Se discordarem do juiz, os outros jogadores podem votar para mudar a decisão (ninguém vota nas próprias respostas).',
+  r7:'🗳️ Se discordarem do juiz, os outros jogadores podem votar para mudar a decisão (ninguém vota nas próprias respostas). Em caso de empate nos votos, a resposta vale <b>metade</b>.',
   you:' (tu)',host:'o anfitrião',player:'Jogador',pubRoom:'Sala pública',privCode:'Sala privada · código',pubShare:'Também podes chamar amigos com este código.',privShare:'Os amigos abrem esta página e entram com este código.',
   playersN:'Jogadores ({0})',pubRules:'Regras: {0} · {1} por ronda · {2} rondas · juiz nível {3} · {4}.',startsIn:'A partida começa em <b data-auto style="margin:0 6px"></b> s',soonerHint:'Se entrarem mais jogadores, começa mais cedo.',
   lookingFor:'À procura de jogadores… ({0}/{1}). A partida começa quando houver pelo menos 2.',leaveRoom:'Sair da sala',
@@ -230,6 +231,7 @@ const S={pt:{
   need2:'Precisas de pelo menos 2 jogadores.',need1col:'Adiciona pelo menos uma coluna.',judgeDenied:'O juiz ficou desligado (sem autorização).',judgeBusy:'O juiz está ocupado demais agora. Decidam por votos nesta ronda.',judgeFail:'O juiz não conseguiu avaliar. Decidam por votos nesta ronda.',
   timeUpX:'Acabou o tempo!',youStop:'Carregaste no STOP!',someone:'Alguém',xStop:'{0} carregou no STOP!',nameFirst:'Escreve primeiro o teu nome.',noPublic:'As salas públicas não estão disponíveis aqui.',noRoomFound:'Não foi possível encontrar uma sala ({0}).',cantResume:'Não foi possível recuperar o jogo.',
   quitT:'Sair do jogo?',quitHost:'Estás a dirigir o jogo: se saíres, outro jogador passa a dirigir.',quitNormal:'Podes voltar a entrar com o mesmo código e o mesmo nome.',yesQuit:'Sim, sair',colExists:'Essa coluna já existe.',maxCols:'Máximo de {0} colunas.',letterPicked:'Letra {0} escolhida!',
+  tieHalf:'½ empate nos votos',dupHalf:'½ repetida noutra coluna',
   roomSize:'Jogadores por sala',maxPlayers:'Máximo de jogadores',playersWord:'jogadores',fullT:'Sala cheia',full:'Esta sala já tem {0} jogadores.',fullPub:'Esta sala encheu. Vamos procurar outra…',
   r_vazia:'resposta vazia',r_dict:'não existe no dicionário',r_pais:'não é um país',r_cor:'não é uma cor conhecida',r_animal:'não é um animal da lista',r_fruto:'não é um fruto da lista',r_nome:'nome desconhecido',r_cidade:'cidade desconhecida',r_acentos:'erro nos acentos',r_ortografia:'erro de ortografia'
 }};
@@ -298,11 +300,20 @@ function score(g,vm){
       const need=jOn?Math.max(2,Math.floor(elig/2)+1):Math.max(1,Math.floor(elig/2)+1);
       const flipped=letter&&elig>0&&votes>=need;
       if(flipped)ok=!ok;
-      res[i][ci]={raw,letter,j,ok,votes,need,flipped,reason:(g.jr||{})[k]||'',pts:0};
+      // empate: metade dos que podem votar contestou (só acontece com número par de votantes)
+      const tie=letter&&!flipped&&elig>=2&&elig%2===0&&votes*2===elig;
+      res[i][ci]={raw,letter,j,ok,votes,need,flipped,tie,dup:false,reason:(g.jr||{})[k]||'',pts:0};
       return ok?a:null;
     });
     const cnt={};valid.forEach(v=>{if(v)cnt[v]=(cnt[v]||0)+1});
     valid.forEach((v,i)=>res[i][ci].pts=v?(cnt[v]>1?5:10):0);
+  });
+  // a mesma palavra em várias colunas (ex.: Fruto "Maçã" e Comida "Maçã"): metade dos pontos em cada uma
+  res.forEach(row=>{
+    const seen={};row.forEach(x=>{const a=norm(x.raw).replace(/[^a-z0-9]/g,'');if(x.letter&&a)(seen[a]=seen[a]||[]).push(x)});
+    Object.values(seen).forEach(xs=>{if(xs.length>1)xs.forEach(x=>x.dup=true)});
+    // cada penalização tira metade (arredondado para cima)
+    row.forEach(x=>{if(x.pts&&(x.tie||x.dup))x.pts=Math.ceil(x.pts/((x.tie?2:1)*(x.dup?2:1)))});
   });
   return res;
 }
@@ -759,6 +770,8 @@ function vReview(){
       else if(x.j==='0'){vd='⚖️ '+esc(reasonText(x.reason));cls='bad'}
       else if(x.j==='1'){vd=t('valid');cls='good'}
       if(x.votes&&x.letter&&!x.flipped)vd+=(vd?' · ':'')+'👎 '+x.votes+'/'+x.need;
+      if(x.ok&&x.tie){vd+=(vd?' · ':'')+t('tieHalf');cls='half'}
+      if(x.ok&&x.dup){vd+=(vd?' · ':'')+t('dupHalf');cls='half'}
     }
     const can=!busy&&mi>=0&&i!==mi&&x.raw&&x.letter;
     return `<button class="arow ${x.raw&&!x.ok?'x':''} ${mine?'voted':''}" data-a="vote" data-p="${i}" data-c="${ci}" ${can?'':'disabled'}><span class="pn">${esc(r.n)}${i===mi?t('you'):''}</span><span class="aw ${x.raw?'':'empty'}">${x.raw?'<span class="atxt">'+esc(x.raw)+'</span>':t('blank')}${vd?`<span class="vd ${cls}">${vd}</span>`:''}</span>${can?`<span class="vbtn">${mine?t('contested'):t('contest')}</span>`:''}<span class="pts p${busy?0:x.pts}">${busy&&x.raw?'…':x.pts}</span></button>`}).join('')}</div>`).join('')+
