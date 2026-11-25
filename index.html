@@ -230,6 +230,7 @@ const S={pt:{
   need2:'Precisas de pelo menos 2 jogadores.',need1col:'Adiciona pelo menos uma coluna.',judgeDenied:'O juiz ficou desligado (sem autorização).',judgeBusy:'O juiz está ocupado demais agora. Decidam por votos nesta ronda.',judgeFail:'O juiz não conseguiu avaliar. Decidam por votos nesta ronda.',
   timeUpX:'Acabou o tempo!',youStop:'Carregaste no STOP!',someone:'Alguém',xStop:'{0} carregou no STOP!',nameFirst:'Escreve primeiro o teu nome.',noPublic:'As salas públicas não estão disponíveis aqui.',noRoomFound:'Não foi possível encontrar uma sala ({0}).',cantResume:'Não foi possível recuperar o jogo.',
   quitT:'Sair do jogo?',quitHost:'Estás a dirigir o jogo: se saíres, outro jogador passa a dirigir.',quitNormal:'Podes voltar a entrar com o mesmo código e o mesmo nome.',yesQuit:'Sim, sair',colExists:'Essa coluna já existe.',maxCols:'Máximo de {0} colunas.',letterPicked:'Letra {0} escolhida!',
+  roomSize:'Jogadores por sala',maxPlayers:'Máximo de jogadores',playersWord:'jogadores',fullT:'Sala cheia',full:'Esta sala já tem {0} jogadores.',fullPub:'Esta sala encheu. Vamos procurar outra…',
   r_vazia:'resposta vazia',r_dict:'não existe no dicionário',r_pais:'não é um país',r_cor:'não é uma cor conhecida',r_animal:'não é um animal da lista',r_fruto:'não é um fruto da lista',r_nome:'nome desconhecido',r_cidade:'cidade desconhecida',r_acentos:'erro nos acentos',r_ortografia:'erro de ortografia'
 }};
 Object.assign(S,window.STOP_I18N||{});
@@ -262,7 +263,9 @@ let tLocal=null, tLeft=0, hostTimer=null, collectTimer=null, pushTimer=null, cdT
 let lastKey='', joinErr='';
 let sampleFn, judgeWarm=false, myVotes=new Set(), votesFor=0;
 let autoTimer=null, autoKey='', autoAt=0, migTimer=null, quickBusy=false, quickTries=0;
-const PUB_MAX=8;
+const PUB_MAX=10;
+let wantSize=Math.min(MAXP,Math.max(2,+lsGet('stop-size')||6)); // jogadores por sala no "Jogar agora"
+const cap=g=>Math.min(MAXP,Math.max(2,+g.mx||MAXP));
 const hostName=()=>esc((G.ro[G.h]||G.ro[0]||{}).n||t('host'));
 
 /* ================= game logic (shared) ================= */
@@ -312,7 +315,7 @@ function sanitizeGame(g){
   const h=Number.isInteger(+g.h)&&+g.h>=0&&+g.h<ro.length?+g.h:0;
   const au=g.au&&typeof g.au==='object'?{k:clean(g.au.k,20),ms:Math.max(0,Math.min(120000,+g.au.ms||0))}:null;
   const jr={};if(g.jr&&typeof g.jr==='object')Object.keys(g.jr).slice(0,120).forEach(k=>{if(/^\d+\.\d+$/.test(k))jr[k]=clean(g.jr[k],40)});
-  return {code:clean(g.code,8),ph,h,pub:!!g.pub,au,n:+g.n||0,pk:+g.pk||0,L,cats,t:+g.t||0,mr:+g.mr||0,hard:!!g.hard,judge:!!g.judge,lv:LEVELS.includes(g.lv)?g.lv:'medio',lg:S.pt&&LANGS.some(l=>l[0]===g.lg)?g.lg:'pt',
+  return {code:clean(g.code,8),ph,h,pub:!!g.pub,au,mx:Math.min(MAXP,Math.max(2,+g.mx||MAXP)),n:+g.n||0,pk:+g.pk||0,L,cats,t:+g.t||0,mr:+g.mr||0,hard:!!g.hard,judge:!!g.judge,lv:LEVELS.includes(g.lv)?g.lv:'medio',lg:S.pt&&LANGS.some(l=>l[0]===g.lg)?g.lg:'pt',
     used:String(g.used||'').replace(/[^A-Z]/g,''),ro,
     hist:(Array.isArray(g.hist)?g.hist:[]).slice(0,30).map(h=>({L:LETTERS.includes(h&&h.L)?h.L:'?',s:(Array.isArray(h&&h.s)?h.s:[]).map(v=>+v||0)})),
     res:Array.isArray(g.res)?g.res.map(a=>Array.isArray(a)?a.map(x=>clean(x,ANSLEN)):[]):null,
@@ -348,8 +351,8 @@ async function joinGame(c,host,resumeG,pub){
   pushMe({name:myName,ans:null,an:0,f:0,stop:0,pick:null});
   if(host){
     if(resumeG){G=resumeG;G.lv=G.lv||'medio';G.h=G.h||0;G.lg=G.lg||'pt';if(['play','stop','review'].includes(G.ph)){G.ph='pick';G.L=null;G.res=null;G.ov={}}}
-    else G={code:c,ph:'lobby',n:0,pk:0,L:null,lg:UI,cats:DEFCATS[UI].slice(),t:90,mr:0,hard:false,lv:'medio',used:'',ro:[],hist:[],res:null,js:'off',jz:null,jr:{},judge:true,sb:null,seq:0,h:0,pub:!!pub,au:null};
-    if(pub)G.mr=5;
+    else G={code:c,ph:'lobby',n:0,pk:0,L:null,lg:UI,cats:DEFCATS[UI].slice(),t:90,mr:0,hard:false,lv:'medio',used:'',ro:[],hist:[],res:null,js:'off',jz:null,jr:{},judge:true,sb:null,seq:0,h:0,pub:!!pub,au:null,mx:MAXP};
+    if(pub){G.mr=5;G.mx=typeof pub==='number'?pub:wantSize}
     if(!G.ro.length)G.ro.push({p:myPeer,n:myName});else{G.ro[G.h].p=myPeer;G.ro[G.h].n=myName}
     publishGame();
   }
@@ -405,7 +408,7 @@ function tryTakeOver(){
 function autoPlan(){
   if(!isHost||!G||!G.pub){if(G)G.au=null;clearTimeout(autoTimer);autoKey='';return}
   let key='',delay=0;const n=G.ro.length;
-  if(G.ph==='lobby'&&n>=2){key='lobby';delay=n>=6?5e3:n>=4?10e3:n>=3?20e3:40e3}
+  if(G.ph==='lobby'&&n>=2){key='lobby';const m=cap(G);delay=n>=m?5e3:Math.round(5e3+55e3*(m-n)/(m-2||1))}
   else if(G.ph==='pick'){key='pick'+G.n;delay=15e3}
   else if(G.ph==='review'&&G.js!=='busy'){key='review'+G.n;delay=30e3}
   else if(G.ph==='scores'){key='scores'+G.hist.length;delay=12e3}
@@ -432,7 +435,7 @@ function hostTick(){
     if(G.ro.some(r=>r.p===p.peer))return;
     const old=G.ro.findIndex((r,i)=>i!==G.h&&norm(r.n)===norm(nm)&&!present.has(r.p));
     if(old>=0){G.ro[old].p=p.peer;changed=true;return}
-    if(['lobby','pick','scores','final'].includes(G.ph)&&G.ro.length<(G.pub?PUB_MAX:MAXP)){
+    if(['lobby','pick','scores','final'].includes(G.ph)&&G.ro.length<cap(G)){
       let n=nm,k=2;while(G.ro.some(r=>norm(r.n)===norm(n)))n=nm.slice(0,15)+' '+(k++);
       G.ro.push({p:p.peer,n});changed=true;
     }
@@ -458,7 +461,7 @@ function publishGame(){
   while(encSize({game:G,name:myName,ans:myAns})>3900&&G.hist.length>1){const a=G.hist.shift(),b=G.hist[0];b.s=b.s.map((v,i)=>v+(a.s[i]||0));b.L=a.L+b.L}
   R.presence({game:JSON.parse(JSON.stringify(G))}).catch(e=>toast(t('syncErr')));
   // Só as salas públicas aparecem na lista; as privadas entram só com o código.
-  if(G.pub)room.presence({hosting:{code,name:myName,ph:G.ph,np:G.ro.length,pub:1,lg:G.lg}}).catch(()=>{});
+  if(G.pub)room.presence({hosting:{code,name:myName,ph:G.ph,np:G.ro.length,mx:cap(G),pub:1,lg:G.lg}}).catch(()=>{});
   else lsSet('stop-host',JSON.stringify({G,ts:Date.now()}));
   onGame();lastKey='';render();
 }
@@ -611,6 +614,11 @@ const gameTop=()=>top(`<div class="row" style="align-items:center"><span class="
 const langSelect=(id,val)=>`<select class="field" id="${id}" style="width:100%">${LANGS.map(([v,n])=>`<option value="${v}" ${v===val?'selected':''}>${esc(n)}</option>`).join('')}</select>`;
 const langName=v=>(LANGS.find(l=>l[0]===v)||LANGS[0])[1];
 
+const stepper=(k,v,min,max)=>`<div class="row" style="align-items:center;gap:10px"><button class="btn line" data-a="step" data-k="${k}" data-d="-1" ${v<=min?'disabled':''} aria-label="−">−</button><b style="font-size:22px;min-width:44px;text-align:center">${v}</b><button class="btn line" data-a="step" data-k="${k}" data-d="1" ${v>=max?'disabled':''} aria-label="+">+</button><span class="hint">${t('playersWord')}</span></div>`;
+function vFull(){
+  if(G.pub&&!vFull.t){vFull.t=setTimeout(()=>{vFull.t=0;if(R&&G&&myIdx()<0&&G.ro.length>=cap(G)){leaveGame();A.quick(true)}},1500)}
+  return {key:'full'+UI+code,html:gameTop()+`<div class="center"><div class="wait">🚪</div><h2 style="justify-content:center">${t('fullT')}</h2><p class="hint">${G.pub?t('fullPub'):t('full',cap(G))}</p><button class="btn line" style="margin-top:20px" data-a="leave">${t('back')}</button></div>`};
+}
 function vConnecting(){return {key:'connecting'+UI,html:top()+`<div class="center"><div class="spin"></div><p class="hint">${t('connecting')}</p></div>`}}
 function vNoRoom(){return {key:'noroom'+UI,html:top()+`<div class="card"><h2>${t('noconnT')}</h2><p class="hint">${t('noconn')}</p></div>`}}
 
@@ -618,16 +626,18 @@ function vHome(){
   const games=lobbyPeers.filter(p=>!(p.isMe&&p.sameTab)&&p.presence&&p.presence.hosting&&p.presence.hosting.code&&p.presence.hosting.pub).map(p=>p.presence.hosting);
   let saved=null;try{saved=JSON.parse(lsGet('stop-host')||'null')}catch(e){}
   if(saved&&(!saved.G||Date.now()-saved.ts>3*3600e3))saved=null;
-  const gl=games.map(h=>({c:clean(h.code,8).toLowerCase(),n:clean(h.name,18),ph:String(h.ph),np:+h.np||0,lg:LANGS.some(l=>l[0]===h.lg)?h.lg:'pt'}));
-  const key=JSON.stringify(['home',UI,gl,!!saved,joinErr,quickBusy]);
+  const gl0=games.map(h=>({c:clean(h.code,8).toLowerCase(),n:clean(h.name,18),ph:String(h.ph),np:+h.np||0,mx:Math.min(MAXP,Math.max(2,+h.mx||MAXP)),lg:LANGS.some(l=>l[0]===h.lg)?h.lg:'pt'}));
+  const gl=gl0.filter(g=>g.np<g.mx);
+  const key=JSON.stringify(['home',UI,gl,!!saved,joinErr,quickBusy,wantSize]);
   const html=top()+`
   <div class="card"><h2>${t('yourName')}</h2>
     <input class="field" id="myname" style="width:100%" placeholder="${t('namePh')}" maxlength="18" value="${esc(myName)}" autocomplete="off">
     <div class="hint" style="margin:12px 0 6px">🌍 ${t('language')}</div>${langSelect('uilang',UI)}
   </div>
   ${window.stopServer?`<div class="card"><h2>${t('online')}</h2><p class="hint" style="margin-bottom:10px">${t('onlineHint',langName(UI))}</p>
-    <button class="btn red big" data-a="quick" ${quickBusy?'disabled':''}>${quickBusy?t('searching'):t('playNow')}</button></div>`:''}
-  ${gl.length?`<div class="card"><h2><span class="dot"></span> ${t('openRooms')}</h2><ul class="games">${gl.map(g=>`<li><div class="gn"><b>${t('roomOf',esc(g.n||'?'))}</b><span class="hint">${t('playersOf',g.np,PUB_MAX)} · ${g.ph==='lobby'?t('waiting'):t('playing')} · ${esc(langName(g.lg))} · ${esc(g.c.toUpperCase())}</span></div><button class="btn red" data-a="join" data-v="${esc(g.c)}">${t('enter')}</button></li>`).join('')}</ul></div>`:''}
+    <div class="hint" style="margin-bottom:6px">${t('roomSize')}</div>${stepper('size',wantSize,2,MAXP)}
+    <button class="btn red big" style="margin-top:12px" data-a="quick" ${quickBusy?'disabled':''}>${quickBusy?t('searching'):t('playNow')}</button></div>`:''}
+  ${gl.length?`<div class="card"><h2><span class="dot"></span> ${t('openRooms')}</h2><ul class="games">${gl.map(g=>`<li><div class="gn"><b>${t('roomOf',esc(g.n||'?'))}</b><span class="hint">${t('playersOf',g.np,g.mx)} · ${g.ph==='lobby'?t('waiting'):t('playing')} · ${esc(langName(g.lg))} · ${esc(g.c.toUpperCase())}</span></div><button class="btn red" data-a="join" data-v="${esc(g.c)}">${t('enter')}</button></li>`).join('')}</ul></div>`:''}
   <div class="card"><h2>${t('privT')}</h2>
     <p class="hint" style="margin-bottom:10px">${t('privHint')}</p>
     <button class="btn line big" data-a="host" style="margin-bottom:14px">${t('createPriv')}</button>
@@ -651,12 +661,12 @@ function vLobby(){
   const pres=[...presentSet()].sort().join();
   const key=JSON.stringify(['lobby',UI,G,isHost,pres]);
   let html=gameTop()+`<div class="center" style="margin-bottom:16px"><div class="eyebrow">${G.pub?t('pubRoom'):t('privCode')}</div><div class="bigcode">${esc(code.toUpperCase())}</div><p class="hint">${G.pub?t('pubShare'):t('privShare')}</p></div>
-  <div class="card"><h2>${t('playersN',G.ro.length)}</h2>${rosterChips()}</div>`;
+  <div class="card"><h2>${t('playersN',G.ro.length+'/'+cap(G))}</h2>${rosterChips()}</div>`;
   if(G.pub){
     const n=G.ro.length;
     html+=`<div class="card"><h2>⚡ ${t('pubRoom')}</h2><p class="hint">${t('pubRules',G.cats.map(esc).join(', '),fmt(G.t),G.mr,lvName(G.lv),esc(langName(G.lg)))}</p></div>
       <div class="center">${G.au?`<div class="wait">⏱️</div><h2 style="justify-content:center">${t('startsIn')}</h2><p class="hint">${t('soonerHint')}</p>`
-        :`<div class="spin"></div><p class="hint">${t('lookingFor',n,PUB_MAX)}</p>`}
+        :`<div class="spin"></div><p class="hint">${t('lookingFor',n,cap(G))}</p>`}
       <button class="btn line" style="margin-top:16px" data-a="leave">${t('leaveRoom')}</button></div>`;
   }else if(isHost){
     const sug=(SUGG[G.lg]||SUGG.pt);
@@ -668,6 +678,7 @@ function vLobby(){
     <div class="card"><h2>${t('houseRules')}</h2>
       <div class="hint" style="margin-bottom:6px">${t('maxTime')}</div>
       <div class="seg">${[[0,t('noTime')],[60,'1 min'],[90,'1:30'],[120,'2 min'],[180,'3 min']].map(([v,l])=>`<button class="${G.t===v?'on':''}" data-a="setT" data-v="${v}">${l}</button>`).join('')}</div>
+      <div class="hint" style="margin:14px 0 6px">${t('maxPlayers')}</div>${stepper('mx',cap(G),Math.max(2,G.ro.length),MAXP)}
       <div class="hint" style="margin:14px 0 6px">${t('rounds')}</div>
       <div class="seg">${[[0,t('free')],[3,'3'],[5,'5'],[10,'10']].map(([v,l])=>`<button class="${G.mr===v?'on':''}" data-a="setR" data-v="${v}">${l}</button>`).join('')}</div>
       <div class="toggle"><div><b>${t('hardL')}</b><div class="hint">${t('hardLHint')}</div></div><button class="sw ${G.hard?'on':''}" data-a="toggleHard" aria-label="${t('hardL')}"></button></div>
@@ -799,6 +810,7 @@ function view(){
   if(room===null)return vNoRoom();
   if(!R)return vHome();
   if(!G||hostGone)return vWaitHost();
+  if(myIdx()<0&&G.ro.length>=cap(G)&&G.ph!=='final')return vFull();
   switch(G.ph){
     case 'lobby':return vLobby();
     case 'pick':return vPick();
@@ -832,11 +844,13 @@ const A={
     if(!needName()||quickBusy)return;
     if(!window.stopServer){toast(t('noPublic'));return}
     quickTries=retry===true?quickTries+1:0;quickBusy=true;lastKey='';render();
-    try{const r=await window.stopServer.quick(UI);quickBusy=false;await joinGame(r.code,!!r.host,null,true)}
+    try{const r=await window.stopServer.quick(UI,wantSize);quickBusy=false;await joinGame(r.code,!!r.host,null,wantSize)}
     catch(e){quickBusy=false;toast(t('noRoomFound',e&&e.code||'?'))}
     lastKey='';render();
   },
   requeue:()=>{leaveGame();A.quick()},
+  step:d=>{const dd=+d.d;if(d.k==='size'){wantSize=Math.min(MAXP,Math.max(2,wantSize+dd));lsSet('stop-size',String(wantSize));lastKey='';render()}
+    else if(d.k==='mx')setG(()=>{G.mx=Math.min(MAXP,Math.max(2,G.ro.length,cap(G)+dd))})},
   join:d=>{if(!needName())return;joinGame(d.v,false)},
   joinCode:()=>{if(!needName())return;joinGame(document.getElementById('jcode').value,false)},
   resume:()=>{if(!needName())return;let s=null;try{s=JSON.parse(lsGet('stop-host'))}catch(e){}const g=s&&sanitizeGame(s.G);if(!g){toast(t('cantResume'));return}joinGame(g.code,true,g)},

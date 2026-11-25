@@ -19,7 +19,8 @@ Jogo multijogador de "Stop" (Adedonha) para telemóvel. Cada jogador joga no seu
 - **Juiz** (`runJudge()`): corre só no dispositivo do anfitrião. Deduplica (categoria + resposta) e envia uma única prompt JSON. O pedido de "aquecimento" em `hostStart()` faz a Claude pedir o consentimento no clique.
 - O render usa uma `key` por ecrã para não redesenhar (nem perder o foco) enquanto se escreve.
 - **Quem dirige** é `G.ro[G.h]` (não é sempre o índice 0). Se essa pessoa desaparecer da sala durante mais de 4,5 s, `tryTakeOver()` passa a direcção ao primeiro jogador presente pela ordem do roster, que retoma a fase em que estava (temporizador, recolha das respostas, juiz). Se o antigo anfitrião voltar e "continuar o jogo", ao ver outro anfitrião passa a jogador.
-- **Salas públicas** (`G.pub`): regras fixas (colunas por omissão, 1:30, 5 rondas, nível Médio), até 8 jogadores, e `autoPlan()` avança sozinho: começa 40/20/10/5 s depois de haver 2/3/4/6 jogadores, sorteia a letra ao fim de 15 s, confirma os pontos ao fim de 30 s e passa à ronda seguinte ao fim de 12 s. O tempo que falta vai em `G.au` e os ecrãs mostram-no em `[data-auto]`. Só as salas públicas publicam `hosting` no lobby (lista "Salas públicas abertas"); as **privadas** só se encontram pelo código.
+- **Lotação** (`G.mx`, 2 a 10, `cap(G)`): nas privadas o anfitrião escolhe em "Regras da casa" (nunca abaixo dos jogadores presentes); no "Jogar agora" cada jogador escolhe o tamanho (`wantSize`, guardado em `localStorage['stop-size']`) e o servidor só junta quem quer o mesmo tamanho e a mesma língua. Quem não cabe vê `vFull()` (nas públicas volta a procurar sala).
+- **Salas públicas** (`G.pub`): regras fixas (colunas por omissão, 1:30, 5 rondas, nível Médio), e `autoPlan()` avança sozinho: começa 5 s depois de encher, ou mais tarde quanto mais vazia estiver (até 60 s com 2 jogadores), sorteia a letra ao fim de 15 s, confirma os pontos ao fim de 30 s e passa à ronda seguinte ao fim de 12 s. O tempo que falta vai em `G.au` e os ecrãs mostram-no em `[data-auto]`. Só as salas públicas publicam `hosting` no lobby (lista "Salas públicas abertas"); as **privadas** só se encontram pelo código.
 
 ## Versão pública (fora da Claude): feita
 
@@ -50,6 +51,7 @@ pip install playwright && python -m playwright install chromium
 node tests/test_dicionario.js      # juiz por dicionário: 50 respostas x 3 níveis
 python tests/test_servidor.py      # sala privada: servidor real + 3 browsers, juiz por dicionário
 python tests/test_publico.py       # sala pública: emparelhamento, início automático e troca de anfitrião (~1,5 min)
+python tests/test_lotacao.py       # sala privada cheia e máximo de jogadores
 python tests/test_linguas.py       # sala em francês com jogador em inglês, motivos traduzidos, salas públicas por língua
 python -m http.server 8765         # noutro terminal, para o teste com mock:
 python tests/test_ronda.py

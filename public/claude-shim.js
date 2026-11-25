@@ -116,7 +116,7 @@
   };
 
   // Funções que só existem no nosso servidor (fora da Claude).
-  window.stopServer = { quick: async lang => { await ready; return call('quick', { lang }); } };
+  window.stopServer = { quick: async (lang, size) => { await ready; return call('quick', { lang, size }); } };
 
   window.claude = {
     use: async n => {

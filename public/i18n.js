@@ -36,6 +36,7 @@ br: {
   need2:'Você precisa de pelo menos 2 jogadores.',need1col:'Adicione pelo menos uma coluna.',judgeDenied:'O juiz foi desligado (sem autorização).',judgeBusy:'O juiz está ocupado demais agora. Decidam por votos nesta rodada.',judgeFail:'O juiz não conseguiu avaliar. Decidam por votos nesta rodada.',
   timeUpX:'Acabou o tempo!',youStop:'Você apertou STOP!',someone:'Alguém',xStop:'{0} apertou STOP!',nameFirst:'Escreva primeiro seu nome.',noPublic:'As salas públicas não estão disponíveis aqui.',noRoomFound:'Não foi possível encontrar uma sala ({0}).',cantResume:'Não foi possível recuperar o jogo.',
   quitT:'Sair do jogo?',quitHost:'Você está comandando o jogo: se sair, outro jogador passa a comandar.',quitNormal:'Você pode voltar com o mesmo código e o mesmo nome.',yesQuit:'Sim, sair',colExists:'Essa coluna já existe.',maxCols:'Máximo de {0} colunas.',letterPicked:'Letra {0} escolhida!',
+  roomSize:'Jogadores por sala',maxPlayers:'Máximo de jogadores',playersWord:'jogadores',fullT:'Sala cheia',full:'Esta sala já tem {0} jogadores.',fullPub:'Esta sala lotou. Vamos procurar outra…',
   r_vazia:'resposta vazia',r_dict:'não existe no dicionário',r_pais:'não é um país',r_cor:'não é uma cor conhecida',r_animal:'não é um animal da lista',r_fruto:'não é uma fruta da lista',r_nome:'nome desconhecido',r_cidade:'cidade desconhecida',r_acentos:'erro nos acentos',r_ortografia:'erro de ortografia'
 },
 en: {
@@ -73,6 +74,7 @@ en: {
   need2:'You need at least 2 players.',need1col:'Add at least one column.',judgeDenied:'The judge was turned off (no permission).',judgeBusy:'The judge is too busy right now. Decide by votes this round.',judgeFail:'The judge could not check the answers. Decide by votes this round.',
   timeUpX:'Time is up!',youStop:'You pressed STOP!',someone:'Someone',xStop:'{0} pressed STOP!',nameFirst:'Type your name first.',noPublic:'Public rooms are not available here.',noRoomFound:'Could not find a room ({0}).',cantResume:'Could not recover the game.',
   quitT:'Leave the game?',quitHost:'You are running the game: if you leave, another player takes over.',quitNormal:'You can come back with the same code and the same name.',yesQuit:'Yes, leave',colExists:'That column already exists.',maxCols:'Maximum of {0} columns.',letterPicked:'Letter {0} chosen!',
+  roomSize:'Players per room',maxPlayers:'Maximum players',playersWord:'players',fullT:'Room full',full:'This room already has {0} players.',fullPub:'This room filled up. Looking for another one…',
   r_vazia:'empty answer',r_dict:'not in the dictionary',r_pais:'not a country',r_cor:'not a known colour',r_animal:'not an animal on the list',r_fruto:'not a fruit on the list',r_nome:'unknown name',r_cidade:'unknown city',r_acentos:'wrong accents',r_ortografia:'spelling mistake'
 },
 fr: {
@@ -110,6 +112,7 @@ fr: {
   need2:'Il faut au moins 2 joueurs.',need1col:'Ajoute au moins une colonne.',judgeDenied:'Le juge a été désactivé (pas d\'autorisation).',judgeBusy:'Le juge est trop occupé pour l\'instant. Décidez par vote cette manche.',judgeFail:'Le juge n\'a pas pu vérifier. Décidez par vote cette manche.',
   timeUpX:'Temps écoulé !',youStop:'Tu as appuyé sur STOP !',someone:'Quelqu\'un',xStop:'{0} a appuyé sur STOP !',nameFirst:'Écris d\'abord ton prénom.',noPublic:'Les salons publics ne sont pas disponibles ici.',noRoomFound:'Impossible de trouver un salon ({0}).',cantResume:'Impossible de récupérer la partie.',
   quitT:'Quitter la partie ?',quitHost:'Tu mènes la partie : si tu pars, un autre joueur prend la main.',quitNormal:'Tu peux revenir avec le même code et le même prénom.',yesQuit:'Oui, quitter',colExists:'Cette colonne existe déjà.',maxCols:'Maximum {0} colonnes.',letterPicked:'Lettre {0} choisie !',
+  roomSize:'Joueurs par salon',maxPlayers:'Nombre maximum de joueurs',playersWord:'joueurs',fullT:'Salon complet',full:'Ce salon a déjà {0} joueurs.',fullPub:'Ce salon est complet. On en cherche un autre…',
   r_vazia:'réponse vide',r_dict:'absent du dictionnaire',r_pais:'ce n\'est pas un pays',r_cor:'couleur inconnue',r_animal:'animal absent de la liste',r_fruto:'fruit absent de la liste',r_nome:'prénom inconnu',r_cidade:'ville inconnue',r_acentos:'erreur d\'accents',r_ortografia:'faute d\'orthographe'
 },
 it: {
@@ -147,6 +150,7 @@ it: {
   need2:'Servono almeno 2 giocatori.',need1col:'Aggiungi almeno una colonna.',judgeDenied:'Il giudice è stato disattivato (senza autorizzazione).',judgeBusy:'Il giudice è troppo occupato ora. Decidete con i voti in questo turno.',judgeFail:'Il giudice non è riuscito a valutare. Decidete con i voti in questo turno.',
   timeUpX:'Tempo scaduto!',youStop:'Hai premuto STOP!',someone:'Qualcuno',xStop:'{0} ha premuto STOP!',nameFirst:'Scrivi prima il tuo nome.',noPublic:'Le stanze pubbliche non sono disponibili qui.',noRoomFound:'Impossibile trovare una stanza ({0}).',cantResume:'Impossibile recuperare la partita.',
   quitT:'Uscire dalla partita?',quitHost:'Stai guidando la partita: se esci, un altro giocatore prende la guida.',quitNormal:'Puoi rientrare con lo stesso codice e lo stesso nome.',yesQuit:'Sì, esci',colExists:'Questa colonna esiste già.',maxCols:'Massimo {0} colonne.',letterPicked:'Lettera {0} scelta!',
+  roomSize:'Giocatori per stanza',maxPlayers:'Numero massimo di giocatori',playersWord:'giocatori',fullT:'Stanza piena',full:'Questa stanza ha già {0} giocatori.',fullPub:'Questa stanza si è riempita. Ne cerco un\'altra…',
   r_vazia:'risposta vuota',r_dict:'non è nel dizionario',r_pais:'non è un paese',r_cor:'colore sconosciuto',r_animal:'animale non in lista',r_fruto:'frutto non in lista',r_nome:'nome sconosciuto',r_cidade:'città sconosciuta',r_acentos:'errore negli accenti',r_ortografia:'errore di ortografia'
 },
 es: {
@@ -184,6 +188,7 @@ es: {
   need2:'Necesitas al menos 2 jugadores.',need1col:'Añade al menos una columna.',judgeDenied:'El juez se desactivó (sin autorización).',judgeBusy:'El juez está demasiado ocupado ahora. Decidid por votos en esta ronda.',judgeFail:'El juez no pudo evaluar. Decidid por votos en esta ronda.',
   timeUpX:'¡Se acabó el tiempo!',youStop:'¡Pulsaste STOP!',someone:'Alguien',xStop:'¡{0} pulsó STOP!',nameFirst:'Escribe primero tu nombre.',noPublic:'Las salas públicas no están disponibles aquí.',noRoomFound:'No se pudo encontrar una sala ({0}).',cantResume:'No se pudo recuperar la partida.',
   quitT:'¿Salir de la partida?',quitHost:'Estás dirigiendo la partida: si sales, otro jugador pasa a dirigirla.',quitNormal:'Puedes volver a entrar con el mismo código y el mismo nombre.',yesQuit:'Sí, salir',colExists:'Esa columna ya existe.',maxCols:'Máximo de {0} columnas.',letterPicked:'¡Letra {0} elegida!',
+  roomSize:'Jugadores por sala',maxPlayers:'Máximo de jugadores',playersWord:'jugadores',fullT:'Sala llena',full:'Esta sala ya tiene {0} jugadores.',fullPub:'Esta sala se llenó. Buscando otra…',
   r_vazia:'respuesta vacía',r_dict:'no está en el diccionario',r_pais:'no es un país',r_cor:'color desconocido',r_animal:'animal fuera de la lista',r_fruto:'fruta fuera de la lista',r_nome:'nombre desconocido',r_cidade:'ciudad desconocida',r_acentos:'error de tildes',r_ortografia:'falta de ortografía'
 }
 };

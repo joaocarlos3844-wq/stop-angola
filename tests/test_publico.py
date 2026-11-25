@@ -34,17 +34,27 @@ try:
             pg.fill('#myname', nome); pages.append(pg)
         A, B, C = pages
         # sala privada de outra pessoa não pode apanhar ninguém do "Jogar agora"
+        # todos querem salas de 3 jogadores (por omissão são 6)
         for pg in pages:
+            for _ in range(3): pg.click('[data-a=step][data-k=size][data-d="-1"]'); pg.wait_for_timeout(100)
             pg.click('[data-a=quick]'); pg.wait_for_selector('.bigcode', timeout=15000); pg.wait_for_timeout(400)
         codes = {code_of(pg) for pg in pages}
         print('Salas:', codes)
         assert len(codes) == 1, 'os 3 deviam estar na mesma sala'
         A.wait_for_function("document.querySelectorAll('.chips .chip').length>=3", timeout=8000)
-        assert 'A partida começa em' in A.inner_text('body')
-        # começa sozinha (3 jogadores: 20 s)
+        assert 'Jogadores (3/3)' in A.inner_text('body')
+        # um 4.º jogador que quer uma sala de 4 vai para outra sala
+        D = b.new_context(viewport={'width': 390, 'height': 844}, locale='pt-PT').new_page()
+        D.goto(URL + '/'); D.wait_for_selector('#myname'); D.fill('#myname', 'Dora')
+        for _ in range(2): D.click('[data-a=step][data-k=size][data-d="-1"]'); D.wait_for_timeout(100)
+        D.click('[data-a=quick]'); D.wait_for_selector('.bigcode', timeout=15000)
+        print('Sala da Dora (4 jogadores):', code_of(D))
+        assert code_of(D) not in codes, 'a Dora não devia entrar na sala de 3'
+        # a sala encheu: começa sozinha em 5 s
         t = time.time()
         for pg in pages: pg.wait_for_selector('.bigletter', timeout=30000)
         print('Começou sozinha em %.0f s' % (time.time() - t))
+        assert time.time() - t < 15, 'sala cheia devia começar em ~5 s'
         # ninguém escolhe a letra: é sorteada sozinha (15 s)
         for pg in pages: pg.wait_for_selector('[data-ans="0"]:not([disabled])', timeout=30000)
         L = A.inner_text('.lbadge').strip()

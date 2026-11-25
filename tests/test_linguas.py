@@ -43,7 +43,7 @@ try:
         B.fill('#myname', 'Bob'); B.fill('#jcode', code); B.click('[data-a=joinCode]')
         C.fill('#myname', 'Carla'); C.fill('#jcode', code); C.click('[data-a=joinCode]')
         A.wait_for_function("document.querySelectorAll('.chips .chip').length>=3", timeout=8000)
-        B.wait_for_selector('text=Players (3)', timeout=8000)
+        B.wait_for_selector('text=Players (3/10)', timeout=8000)
         check('Français' in B.inner_text('body'), 'o Bob vê que o jogo é em francês')
         for _ in range(4): A.click('[data-a=rmCat][data-i="3"]'); A.wait_for_timeout(150)
         A.click('[data-a=start]'); A.wait_for_selector('[data-a=pick][data-v=P]'); A.click('[data-a=pick][data-v=P]')
