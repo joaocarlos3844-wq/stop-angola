@@ -2,7 +2,7 @@
 // uma chave que falte aqui aparece em português.
 window.STOP_I18N = {
 br: {
-  madeBy:'Uma criação dos {0}',credits:'Créditos',creditsCompany:'Criado por',creditsIdea:'Ideia original e direção criativa',creditsRole:'CEO e diretor criativo',allRights:'Todos os direitos reservados.',close:'Fechar',
+  madeBy:'Uma criação dos {0}',credits:'Créditos',creditsCompany:'Criado por',allRights:'Todos os direitos reservados.',close:'Fechar',
   welcomeT:'Bem-vindo ao Stop!',welcome:'O jogo das letras para jogar com os amigos, cada um no seu celular.',begin:'Começar',chooseLang:'Escolha seu idioma',chooseLangHint:'Você pode mudar quando quiser.',chooseMode:'Como você quer jogar?',modePubT:'Sala pública',modePub:'Jogue com pessoas de todo lugar. A partida começa sozinha.',modePrivT:'Sala privada',modePriv:'Só com seus amigos, por meio de um código. Você escolhe as regras.',
   tagline:'o jogo das letras',quit:'Sair',connecting:'Conectando…',noconnT:'Não foi possível conectar',noconn:'Não conseguimos conectar ao servidor do jogo. Verifique sua internet e recarregue a página.',
   yourName:'Seu nome',namePh:'Como te chamam?',language:'Idioma',online:'Jogar online',onlineHint:'Você entra numa sala pública com outros jogadores ({0}). A partida começa sozinha.',searching:'Procurando sala…',playNow:'Jogar agora',
@@ -43,7 +43,7 @@ br: {
   r_vazia:'resposta vazia',r_dict:'não existe no dicionário',r_pais:'não é um país',r_cor:'não é uma cor conhecida',r_animal:'não é um animal da lista',r_fruto:'não é uma fruta da lista',r_nome:'nome desconhecido',r_cidade:'cidade desconhecida',r_acentos:'erro nos acentos',r_ortografia:'erro de ortografia'
 },
 en: {
-  madeBy:'Made by {0}',credits:'Credits',creditsCompany:'Created by',creditsIdea:'Original idea and creative direction',creditsRole:'CEO and creative director',allRights:'All rights reserved.',close:'Close',
+  madeBy:'Made by {0}',credits:'Credits',creditsCompany:'Created by',allRights:'All rights reserved.',close:'Close',
   welcomeT:'Welcome to Stop!',welcome:'The letters game to play with friends, each on their own phone.',begin:'Get started',chooseLang:'Choose your language',chooseLangHint:'You can change it any time.',chooseMode:'How do you want to play?',modePubT:'Public room',modePub:'Play with people from anywhere. The match starts on its own.',modePrivT:'Private room',modePriv:'Only with your friends, using a code. You set the rules.',
   tagline:'the letters game',quit:'Leave',connecting:'Connecting…',noconnT:'Could not connect',noconn:'We could not reach the game server. Check your internet and reload the page.',
   yourName:'Your name',namePh:'What do they call you?',language:'Language',online:'Play online',onlineHint:'You join a public room with other players ({0}). The match starts on its own.',searching:'Looking for a room…',playNow:'Play now',
@@ -84,7 +84,7 @@ en: {
   r_vazia:'empty answer',r_dict:'not in the dictionary',r_pais:'not a country',r_cor:'not a known colour',r_animal:'not an animal on the list',r_fruto:'not a fruit on the list',r_nome:'unknown name',r_cidade:'unknown city',r_acentos:'wrong accents',r_ortografia:'spelling mistake'
 },
 fr: {
-  madeBy:'Une création {0}',credits:'Crédits',creditsCompany:'Créé par',creditsIdea:'Idée originale et direction créative',creditsRole:'PDG et directeur de la création',allRights:'Tous droits réservés.',close:'Fermer',
+  madeBy:'Une création {0}',credits:'Crédits',creditsCompany:'Créé par',allRights:'Tous droits réservés.',close:'Fermer',
   welcomeT:'Bienvenue dans Stop !',welcome:'Le jeu des lettres à jouer entre amis, chacun sur son téléphone.',begin:'Commencer',chooseLang:'Choisis ta langue',chooseLangHint:'Tu peux la changer quand tu veux.',chooseMode:'Comment veux-tu jouer ?',modePubT:'Salon public',modePub:'Joue avec des gens de partout. La partie démarre toute seule.',modePrivT:'Salon privé',modePriv:'Seulement avec tes amis, grâce à un code. Tu choisis les règles.',
   tagline:'le jeu des lettres',quit:'Quitter',connecting:'Connexion…',noconnT:'Connexion impossible',noconn:'Impossible de joindre le serveur du jeu. Vérifie ta connexion et recharge la page.',
   yourName:'Ton prénom',namePh:'Comment on t\'appelle ?',language:'Langue',online:'Jouer en ligne',onlineHint:'Tu rejoins un salon public avec d\'autres joueurs ({0}). La partie démarre toute seule.',searching:'Recherche d\'un salon…',playNow:'Jouer maintenant',
@@ -125,7 +125,7 @@ fr: {
   r_vazia:'réponse vide',r_dict:'absent du dictionnaire',r_pais:'ce n\'est pas un pays',r_cor:'couleur inconnue',r_animal:'animal absent de la liste',r_fruto:'fruit absent de la liste',r_nome:'prénom inconnu',r_cidade:'ville inconnue',r_acentos:'erreur d\'accents',r_ortografia:'faute d\'orthographe'
 },
 it: {
-  madeBy:'Una creazione {0}',credits:'Crediti',creditsCompany:'Creato da',creditsIdea:'Idea originale e direzione creativa',creditsRole:'CEO e direttore creativo',allRights:'Tutti i diritti riservati.',close:'Chiudi',
+  madeBy:'Una creazione {0}',credits:'Crediti',creditsCompany:'Creato da',allRights:'Tutti i diritti riservati.',close:'Chiudi',
   welcomeT:'Benvenuto in Stop!',welcome:'Il gioco delle lettere da fare con gli amici, ognuno con il proprio telefono.',begin:'Inizia',chooseLang:'Scegli la tua lingua',chooseLangHint:'Puoi cambiarla quando vuoi.',chooseMode:'Come vuoi giocare?',modePubT:'Stanza pubblica',modePub:'Gioca con persone da ovunque. La partita parte da sola.',modePrivT:'Stanza privata',modePriv:'Solo con i tuoi amici, tramite un codice. Le regole le scegli tu.',
   tagline:'il gioco delle lettere',quit:'Esci',connecting:'Connessione…',noconnT:'Impossibile connettersi',noconn:'Non riusciamo a raggiungere il server del gioco. Controlla la connessione e ricarica la pagina.',
   yourName:'Il tuo nome',namePh:'Come ti chiami?',language:'Lingua',online:'Gioca online',onlineHint:'Entri in una stanza pubblica con altri giocatori ({0}). La partita parte da sola.',searching:'Cerco una stanza…',playNow:'Gioca ora',
@@ -166,7 +166,7 @@ it: {
   r_vazia:'risposta vuota',r_dict:'non è nel dizionario',r_pais:'non è un paese',r_cor:'colore sconosciuto',r_animal:'animale non in lista',r_fruto:'frutto non in lista',r_nome:'nome sconosciuto',r_cidade:'città sconosciuta',r_acentos:'errore negli accenti',r_ortografia:'errore di ortografia'
 },
 es: {
-  madeBy:'Una creación de {0}',credits:'Créditos',creditsCompany:'Creado por',creditsIdea:'Idea original y dirección creativa',creditsRole:'CEO y director creativo',allRights:'Todos los derechos reservados.',close:'Cerrar',
+  madeBy:'Una creación de {0}',credits:'Créditos',creditsCompany:'Creado por',allRights:'Todos los derechos reservados.',close:'Cerrar',
   welcomeT:'¡Bienvenido a Stop!',welcome:'El juego de las letras para jugar con amigos, cada uno en su móvil.',begin:'Empezar',chooseLang:'Elige tu idioma',chooseLangHint:'Puedes cambiarlo cuando quieras.',chooseMode:'¿Cómo quieres jugar?',modePubT:'Sala pública',modePub:'Juega con gente de todas partes. La partida empieza sola.',modePrivT:'Sala privada',modePriv:'Solo con tus amigos, mediante un código. Tú eliges las reglas.',
   tagline:'el juego de las letras',quit:'Salir',connecting:'Conectando…',noconnT:'No se pudo conectar',noconn:'No pudimos conectar con el servidor del juego. Revisa tu internet y recarga la página.',
   yourName:'Tu nombre',namePh:'¿Cómo te llaman?',language:'Idioma',online:'Jugar en línea',onlineHint:'Entras en una sala pública con otros jugadores ({0}). La partida empieza sola.',searching:'Buscando sala…',playNow:'Jugar ahora',

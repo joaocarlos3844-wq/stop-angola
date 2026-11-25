@@ -403,7 +403,7 @@ const S={pt:{
   timeUpX:'Acabou o tempo!',youStop:'Carregaste no STOP!',someone:'Alguém',xStop:'{0} carregou no STOP!',nameFirst:'Escreve primeiro o teu nome.',noPublic:'As salas públicas não estão disponíveis aqui.',noRoomFound:'Não foi possível encontrar uma sala ({0}).',cantResume:'Não foi possível recuperar o jogo.',
   quitT:'Sair do jogo?',quitHost:'Estás a dirigir o jogo: se saíres, outro jogador passa a dirigir.',quitNormal:'Podes voltar a entrar com o mesmo código e o mesmo nome.',yesQuit:'Sim, sair',colExists:'Essa coluna já existe.',maxCols:'Máximo de {0} colunas.',letterPicked:'Letra {0} escolhida!',
   welcomeT:'Bem-vindo ao Stop!',welcome:'O jogo das letras para jogar com os amigos, cada um no seu telemóvel.',begin:'Começar',chooseLang:'Escolhe a tua língua',chooseLangHint:'Podes mudar quando quiseres.',chooseMode:'Como queres jogar?',modePubT:'Sala pública',modePub:'Joga com pessoas de todo o lado. A partida começa sozinha.',modePrivT:'Sala privada',modePriv:'Só com os teus amigos, através de um código. Tu escolhes as regras.',
-  madeBy:'Uma criação dos {0}',credits:'Créditos',creditsCompany:'Criado por',creditsIdea:'Ideia original e direcção criativa',creditsRole:'CEO e director criativo',allRights:'Todos os direitos reservados.',close:'Fechar',
+  madeBy:'Uma criação dos {0}',credits:'Créditos',creditsCompany:'Criado por',allRights:'Todos os direitos reservados.',close:'Fechar',
   tieHalf:'½ empate nos votos',dupHalf:'½ repetida noutra coluna',
   roomSize:'Jogadores por sala',maxPlayers:'Máximo de jogadores',playersWord:'jogadores',fullT:'Sala cheia',full:'Esta sala já tem {0} jogadores.',fullPub:'Esta sala encheu. Vamos procurar outra…',
   r_vazia:'resposta vazia',r_dict:'não existe no dicionário',r_pais:'não é um país',r_cor:'não é uma cor conhecida',r_animal:'não é um animal da lista',r_fruto:'não é um fruto da lista',r_nome:'nome desconhecido',r_cidade:'cidade desconhecida',r_acentos:'erro nos acentos',r_ortografia:'erro de ortografia'
@@ -839,11 +839,10 @@ function vNoRoom(){return {key:'noroom'+UI,html:top()+state('wifi',t('noconnT'),
 /* ----- ecrã inicial em passos: boas-vindas → língua → pública/privada → entrar ----- */
 let hs='welcome';
 const stepHead=(n,back)=>`<div class="stephead"><button class="ghost" data-a="hs" data-v="${back}">${ic('back')}${t('back')}</button><span class="steps">${[1,2,3].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</span></div>`;
-const STUDIO='Estúdios Gruta',CREATOR='João Carlos Domingos';
+const STUDIO='Estúdios Gruta, Lda';
 function showCredits(){
   overlay(`<div class="modal credits" role="dialog" aria-modal="true" aria-label="${t('credits')}">${MARK}<h2>Stop!</h2>
-    <dl><dt>${t('creditsCompany')}</dt><dd>${STUDIO}</dd>
-    <dt>${t('creditsIdea')}</dt><dd>${CREATOR}<small>${t('creditsRole')}</small></dd></dl>
+    <dl><dt>${t('creditsCompany')}</dt><dd>${STUDIO}</dd></dl>
     <p class="copy">© ${new Date().getFullYear()} ${STUDIO}. ${t('allRights')}</p>
     <button class="btn line big" id="mclose">${t('close')}</button></div>`);
   const c=()=>closeOverlay();document.getElementById('mclose').onclick=c;ov.onclick=e=>{if(e.target===ov){ov.onclick=null;c()}};
